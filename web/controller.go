@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/GoLangDream/rgo/rstring"
 	"reflect"
+	"regexp"
+	"strings"
 )
 
 type Controller interface {
@@ -17,20 +19,8 @@ var controllers = make(map[string]reflect.Type)
 // 这样可以省略第一个 name 参数，根据默认的规则 web/controllers/HomeController 就自动注册成home
 func RegisterController(name string, controller Controller) {
 	controllerType := reflect.TypeOf(controller)
+	fmt.Println(controllerType.PkgPath())
 	controllers[name] = controllerType
-}
-
-type BaseController struct {
-	name    string
-	context *HttpContext
-}
-
-func (c *BaseController) Text(body string) {
-	if c.context != nil {
-		c.context.Text(body)
-	} else {
-		fmt.Println("http context 没有初始化")
-	}
 }
 
 func doAction(controllerName string, actionName string, ctx *HttpContext) {
@@ -51,4 +41,13 @@ func doAction(controllerName string, actionName string, ctx *HttpContext) {
 	} else {
 		fmt.Printf("调用的action [%s]不存在 \n", rstring.Capitalize(actionName))
 	}
+}
+
+func getNamespace(packagePath string) string {
+	r := regexp.MustCompile(`.*/web/controllers/\/?(.+)\/?`)
+	matchArr := r.FindStringSubmatch(packagePath)
+	if len(matchArr) >= 2 {
+		return strings.TrimRight(matchArr[1], "/")
+	}
+	return ""
 }
