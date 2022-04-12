@@ -17,20 +17,27 @@ var controllers = make(map[string]reflect.Type)
 // RegisterController 优化
 // 通过 reflect.TypeOf(controller).PkgPath() 获取包名，从而自动注册.
 // 这样可以省略第一个 name 参数，根据默认的规则 web/controllers/HomeController 就自动注册成home
-func RegisterController(name string, controller Controller) {
+func RegisterController(controller Controller) {
 	controllerType := reflect.TypeOf(controller)
-	fmt.Println(controllerType.PkgPath())
-	controllers[name] = controllerType
+	namespace := getNamespace(controllerType.PkgPath())
+	name := getName(controllerType.Name())
+	if namespace == "" {
+		controllers[name] = controllerType
+	} else {
+		controllers[namespace+"/"+name] = controllerType
+	}
+
 }
 
 func doAction(controllerName string, actionName string, ctx *HttpContext) {
 	controllerType, ok := controllers[controllerName]
-	controller := reflect.New(controllerType)
+
 	if !ok {
 		fmt.Println("调用的controller不存在")
 		return
 	}
 
+	controller := reflect.New(controllerType)
 	baseController := &BaseController{controllerName, ctx}
 	controller.Elem().FieldByName("BaseController").Set(reflect.ValueOf(baseController))
 
@@ -48,6 +55,14 @@ func getNamespace(packagePath string) string {
 	matchArr := r.FindStringSubmatch(packagePath)
 	if len(matchArr) >= 2 {
 		return strings.TrimRight(matchArr[1], "/")
+	}
+	return ""
+}
+
+func getName(typeName string) string {
+	if strings.Contains(typeName, "Controller") {
+		return strings.ToLower(strings.Replace(
+			typeName, "Controller", "", -1))
 	}
 	return ""
 }
