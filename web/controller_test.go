@@ -27,4 +27,21 @@ var _ = Describe("Controller", func() {
 			Expect(namespace).To(Equal("home"))
 		})
 	})
+
+	Context("getName 函数", func() {
+		It("HomeController 应该返回 home", func() {
+			name := getName("HomeController")
+			Expect(name).To(Equal("home"))
+		})
+
+		It("如果struct 名不包括Controller，就返回空字符串", func() {
+			name := getName("HomeContr")
+			Expect(name).To(Equal(""))
+		})
+
+		It("Homecontroller 当controller小写时，不符合规则，返回空字符串", func() {
+			name := getName("Homecontroller")
+			Expect(name).To(Equal(""))
+		})
+	})
 })

@@ -14,9 +14,6 @@ type Controller interface {
 
 var controllers = make(map[string]reflect.Type)
 
-// RegisterController 优化
-// 通过 reflect.TypeOf(controller).PkgPath() 获取包名，从而自动注册.
-// 这样可以省略第一个 name 参数，根据默认的规则 web/controllers/HomeController 就自动注册成home
 func RegisterController(controller Controller) {
 	controllerType := reflect.TypeOf(controller)
 	namespace := getNamespace(controllerType.PkgPath())
@@ -38,11 +35,11 @@ func doAction(controllerName string, actionName string, ctx *HttpContext) {
 	}
 
 	controller := reflect.New(controllerType)
-	baseController := &BaseController{controllerName, ctx}
+	baseController := newBaseController(controllerName, ctx)
 	controller.Elem().FieldByName("BaseController").Set(reflect.ValueOf(baseController))
 
 	method := controller.MethodByName(
-		rstring.Capitalize(actionName))
+		rstring.Camelize(actionName))
 	if method.IsValid() {
 		method.Call([]reflect.Value{})
 	} else {
