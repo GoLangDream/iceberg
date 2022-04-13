@@ -3,7 +3,7 @@ module github.com/GoLangDream/iceberg
 go 1.18
 
 require (
-	github.com/GoLangDream/rgo v0.0.0-20220403074750-30f3cd6326cf
+	github.com/GoLangDream/rgo v0.0.0-20220413173638-a5f2ef63582b
 	github.com/gin-contrib/sessions v0.0.4
 	github.com/gin-gonic/gin v1.7.7
 	github.com/onsi/ginkgo/v2 v2.1.3
