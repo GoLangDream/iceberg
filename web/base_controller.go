@@ -30,7 +30,7 @@ func (c *BaseController) Text(body string) {
 	}
 }
 
-func (c *BaseController) Session(name string, val ...interface{}) interface{} {
+func (c *BaseController) Session(name string, val ...any) any {
 	switch len(val) {
 	case 0:
 		return c.session.Get(name)
