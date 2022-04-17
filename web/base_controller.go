@@ -2,6 +2,7 @@ package web
 
 import (
 	"fmt"
+	"github.com/GoLangDream/rgo/option"
 	"github.com/gin-contrib/sessions"
 )
 
@@ -41,11 +42,21 @@ func (c *BaseController) Session(name string, val ...interface{}) interface{} {
 }
 
 func (c *BaseController) Cookie(name string, val ...interface{}) interface{} {
-	switch len(val) {
-	case 0:
+	valLen := len(val)
+
+	switch {
+	case valLen == 0:
 		return c.context.cookie(name)
-	case 1:
-		//c.context.setCookie(name, val[0])
+	case valLen >= 1:
+		cookieOption := option.Merge(cookieConfig, val[1:])
+		c.context.setCookie(
+			name,
+			val[0].(string),
+			cookieOption.Get("maxAge").(int),
+			cookieOption.Get("path").(string),
+			cookieOption.Get("domain").(string),
+			cookieOption.Get("secure").(bool),
+			cookieOption.Get("httpOnly").(bool))
 	}
 	return nil
 }
