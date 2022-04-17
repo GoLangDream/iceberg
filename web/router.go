@@ -1,16 +1,14 @@
 package web
 
 import (
-	"strings"
-
-	. "github.com/GoLangDream/iceberg"
 	"github.com/gin-gonic/gin"
+	"strings"
 )
 
 type Router struct {
 }
 
-func (r Router) GET(path, to string, options ...Opt) {
+func (r Router) GET(path, to string) {
 	toSlice := strings.Split(to, "#")
 
 	server.engine.GET(path, func(ctx *gin.Context) {
