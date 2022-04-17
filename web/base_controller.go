@@ -39,3 +39,13 @@ func (c *BaseController) Session(name string, val ...interface{}) interface{} {
 	}
 	return nil
 }
+
+func (c *BaseController) Cookie(name string, val ...interface{}) interface{} {
+	switch len(val) {
+	case 0:
+		return c.context.cookie(name)
+	case 1:
+		//c.context.setCookie(name, val[0])
+	}
+	return nil
+}
