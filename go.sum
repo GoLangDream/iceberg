@@ -3,6 +3,8 @@ github.com/GoLangDream/rgo v0.0.0-20220403074750-30f3cd6326cf h1:SEDO61EhnFhiXo2
 github.com/GoLangDream/rgo v0.0.0-20220403074750-30f3cd6326cf/go.mod h1:M+kzSNKPrpBE2JsvwipBgGKgS5xO9FZul8GrNIU2K0I=
 github.com/GoLangDream/rgo v0.0.0-20220413173638-a5f2ef63582b h1:1XoPsXdqFvlW+dBCtK3t4kU9XlmhsNiOPATh8YHxwPc=
 github.com/GoLangDream/rgo v0.0.0-20220413173638-a5f2ef63582b/go.mod h1:GU9v9IGuh75O6jIrRI9MfLJLg0eWbJ2HIDUjg+mRA7s=
+github.com/GoLangDream/rgo v0.0.0-20220417124112-56b23c68ce86 h1:qcsGyGmDyimouW7dw7JfnYAm9uQoYc4yFUPpmYj5V3Q=
+github.com/GoLangDream/rgo v0.0.0-20220417124112-56b23c68ce86/go.mod h1:av5BOy95zTkJBW9dXyFVKM7Q/NOsGR0IdQklGxZOms4=
 github.com/agext/levenshtein v1.2.1/go.mod h1:JEDfjyjHDjOF/1e4FlBE/PkbqA9OfWu2ki2W0IB5558=
 github.com/antonlindstrom/pgstore v0.0.0-20200229204646-b08ebf1105e0/go.mod h1:2Ti6VUHVxpC0VSmTZzEvpzysnaGAfGBOoMIz5ykPyyw=
 github.com/apparentlymart/go-dump v0.0.0-20180507223929-23540a00eaa3/go.mod h1:oL81AME2rN47vu18xqj1S1jPIPuN7afo62yKTNn3XMM=
