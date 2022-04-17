@@ -7,4 +7,5 @@ import (
 
 func initConfig() {
 	config.AddDriver(yaml.Driver)
+	initCookieConfig()
 }
