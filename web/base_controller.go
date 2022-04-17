@@ -2,7 +2,7 @@ package web
 
 import (
 	"fmt"
-	"github.com/GoLangDream/rgo/option"
+	. "github.com/GoLangDream/rgo/option"
 	"github.com/gin-contrib/sessions"
 )
 
@@ -41,22 +41,27 @@ func (c *BaseController) Session(name string, val ...interface{}) interface{} {
 	return nil
 }
 
-func (c *BaseController) Cookie(name string, val ...interface{}) interface{} {
-	valLen := len(val)
+func (c *BaseController) Cookie(name string, val ...any) string {
 
-	switch {
-	case valLen == 0:
+	switch len(val) {
+	case 0:
 		return c.context.cookie(name)
-	case valLen >= 1:
-		cookieOption := option.Merge(cookieConfig, val[1:])
-		c.context.setCookie(
-			name,
-			val[0].(string),
-			cookieOption.Get("maxAge").(int),
-			cookieOption.Get("path").(string),
-			cookieOption.Get("domain").(string),
-			cookieOption.Get("secure").(bool),
-			cookieOption.Get("httpOnly").(bool))
+	case 1:
+		c.setCookie(name, val[0].(string), Option{})
+	case 2:
+		c.setCookie(name, val[0].(string), val[1].(Option))
 	}
-	return nil
+	return ""
+}
+
+func (c *BaseController) setCookie(name string, value string, option Option) {
+	Merge(cookieConfig, option)
+	c.context.setCookie(
+		name,
+		value,
+		cookieConfig["maxAge"].(int),
+		cookieConfig["path"].(string),
+		cookieConfig["domain"].(string),
+		cookieConfig["secure"].(bool),
+		cookieConfig["httpOnly"].(bool))
 }
