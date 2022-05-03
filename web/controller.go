@@ -1,8 +1,8 @@
 package web
 
 import (
-	"fmt"
 	"github.com/GoLangDream/rgo/rstring"
+	"log"
 	"reflect"
 	"regexp"
 	"strings"
@@ -30,7 +30,7 @@ func doAction(controllerName string, actionName string, ctx *HttpContext) {
 	controllerType, ok := controllers[controllerName]
 
 	if !ok {
-		fmt.Println("调用的controller不存在")
+		log.Println("调用的controller不存在")
 		return
 	}
 
@@ -43,7 +43,7 @@ func doAction(controllerName string, actionName string, ctx *HttpContext) {
 	if method.IsValid() {
 		method.Call([]reflect.Value{})
 	} else {
-		fmt.Printf("调用的action [%s]不存在 \n", rstring.Capitalize(actionName))
+		log.Printf("调用的action [%s]不存在 \n", rstring.Capitalize(actionName))
 	}
 }
 
@@ -58,7 +58,7 @@ func getNamespace(packagePath string) string {
 
 func getName(typeName string) string {
 	if strings.Contains(typeName, "Controller") {
-		return strings.ToLower(strings.Replace(
+		return rstring.Underscore(strings.Replace(
 			typeName, "Controller", "", -1))
 	}
 	return ""

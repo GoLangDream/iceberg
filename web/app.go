@@ -11,10 +11,3 @@ type app struct {
 func (a *app) start() {
 	a.engine.Run()
 }
-
-func Start() {
-	initConfig()
-	initSession()
-	initRoutes()
-	initServer()
-}
