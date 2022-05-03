@@ -3,59 +3,51 @@ package web
 import (
 	"github.com/GoLangDream/rgo/rstring"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"strings"
 )
 
 type Router struct {
+	namespace string
+	scope     string
+	engine    gin.IRouter
 }
 
-func newRouter() Router {
-	return Router{}
+func newRootRouter() Router {
+	return Router{"", "", server.engine}
+}
+
+func (r *Router) handleRequest(httpMethod, path, to string) {
+	toSlice := strings.Split(to, "#")
+	registerRouter(httpMethod, path, toSlice[0], toSlice[1])
+
+	r.engine.Handle(httpMethod, path, func(ctx *gin.Context) {
+		httpContext := HttpContext{ctx}
+		doAction(
+			urlJoin(r.namespace, toSlice[0]),
+			toSlice[1],
+			&httpContext)
+	})
 }
 
 func (r *Router) GET(path, to string) {
-	toSlice := strings.Split(to, "#")
-	registerRouter("GET", path, toSlice[0], toSlice[1])
-
-	server.engine.GET(path, func(ctx *gin.Context) {
-		httpContext := HttpContext{ctx}
-		doAction(toSlice[0], toSlice[1], &httpContext)
-	})
+	r.handleRequest(http.MethodGet, path, to)
 }
 
 func (r *Router) PUT(path, to string) {
-	toSlice := strings.Split(to, "#")
-	registerRouter("PUT", path, toSlice[0], toSlice[1])
-
-	server.engine.PUT(path, func(ctx *gin.Context) {
-		httpContext := HttpContext{ctx}
-		doAction(toSlice[0], toSlice[1], &httpContext)
-	})
+	r.handleRequest(http.MethodPut, path, to)
 }
 
 func (r *Router) POST(path, to string) {
-	toSlice := strings.Split(to, "#")
-
-	registerRouter("POST", path, toSlice[0], toSlice[1])
-	server.engine.POST(path, func(ctx *gin.Context) {
-		httpContext := HttpContext{ctx}
-		doAction(toSlice[0], toSlice[1], &httpContext)
-	})
+	r.handleRequest(http.MethodPost, path, to)
 }
 
 func (r *Router) DELETE(path, to string) {
-	toSlice := strings.Split(to, "#")
-
-	registerRouter("DELETE", path, toSlice[0], toSlice[1])
-	server.engine.DELETE(path, func(ctx *gin.Context) {
-		httpContext := HttpContext{ctx}
-		doAction(toSlice[0], toSlice[1], &httpContext)
-	})
+	r.handleRequest(http.MethodDelete, path, to)
 }
 
 func (r *Router) Resources(name string) {
 	pluralName := rstring.Plural(name)
-	//singularName := rstring.Singular(name)
 
 	r.GET(pluralName, pluralName+"#index")
 	r.GET(pluralName+"/:id", pluralName+"#show")
@@ -64,5 +56,4 @@ func (r *Router) Resources(name string) {
 	r.PUT(pluralName+"/:id", pluralName+"#update")
 
 	r.DELETE(pluralName+"/:id", pluralName+"#destory")
-
 }

@@ -18,15 +18,11 @@ func RegisterController(controller Controller) {
 	controllerType := reflect.TypeOf(controller)
 	namespace := getNamespace(controllerType.PkgPath())
 	name := getName(controllerType.Name())
-	if namespace == "" {
-		controllers[name] = controllerType
-	} else {
-		controllers[namespace+"/"+name] = controllerType
-	}
-
+	
+	controllers[urlJoin(namespace, name)] = controllerType
 }
 
-func doAction(controllerName string, actionName string, ctx *HttpContext) {
+func doAction(controllerName, actionName string, ctx *HttpContext) {
 	controllerType, ok := controllers[controllerName]
 
 	if !ok {

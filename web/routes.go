@@ -5,7 +5,7 @@ import "github.com/GoLangDream/rgo/rstring"
 var routerInfos []RouterInfo
 
 func initRoutes() {
-	router := newRouter()
+	router := newRootRouter()
 	ApplicationRouterDraw(router)
 }
 
