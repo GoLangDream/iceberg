@@ -9,13 +9,13 @@ func initRoutes() {
 	ApplicationRouterDraw(router)
 }
 
-func registerRouter(method, path, structName, structMethod string) {
+func registerRouter(method, path, structName, structMethod, namespace string) {
 	routerInfos = append(
 		routerInfos,
 		RouterInfo{
 			"GET",
 			path,
-			rstring.Camelize(structName) + "Controller",
+			urlJoin(namespace, rstring.Camelize(structName)+"Controller"),
 			rstring.Camelize(structMethod),
 		})
 }
