@@ -19,7 +19,11 @@ func newRootRouter() Router {
 
 func (r *Router) handleRequest(httpMethod, path, to string) {
 	toSlice := strings.Split(to, "#")
-	registerRouter(httpMethod, path, toSlice[0], toSlice[1])
+	if value, ok := r.engine.(*gin.RouterGroup); ok {
+		registerRouter(httpMethod, urlJoin(value.BasePath(), path), toSlice[0], toSlice[1])
+	} else {
+		registerRouter(httpMethod, path, toSlice[0], toSlice[1])
+	}
 
 	r.engine.Handle(httpMethod, path, func(ctx *gin.Context) {
 		httpContext := HttpContext{ctx}

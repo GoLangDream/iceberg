@@ -18,7 +18,7 @@ func RegisterController(controller Controller) {
 	controllerType := reflect.TypeOf(controller)
 	namespace := getNamespace(controllerType.PkgPath())
 	name := getName(controllerType.Name())
-	
+
 	controllers[urlJoin(namespace, name)] = controllerType
 }
 
@@ -26,7 +26,11 @@ func doAction(controllerName, actionName string, ctx *HttpContext) {
 	controllerType, ok := controllers[controllerName]
 
 	if !ok {
-		log.Println("调用的controller不存在")
+		for cName, cType := range controllers {
+			log.Printf("controller [%s], class [%v]", cName, cType)
+		}
+
+		log.Printf("调用的controller不存在 %s\n", controllerName)
 		return
 	}
 

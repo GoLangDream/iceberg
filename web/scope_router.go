@@ -6,21 +6,21 @@ func urlJoin(paths ...string) string {
 	return filepath.Join(paths...)
 }
 
-func (r *Router) Namespace(path string, block func(router Router)) {
+func (r *Router) Namespace(name string, block func(router Router)) {
 	router := Router{
-		urlJoin(r.namespace, path),
+		urlJoin(r.namespace, name),
 		r.scope,
-		r.engine.Group(path),
+		r.engine.Group(name),
 	}
 
 	block(router)
 }
 
-func (r *Router) Scope(path string, block func(router Router)) {
+func (r *Router) Scope(name string, block func(router Router)) {
 	router := Router{
-		urlJoin(r.namespace, path),
-		r.scope,
-		r.engine.Group(path),
+		r.namespace,
+		urlJoin(r.scope, name),
+		r.engine.Group(name),
 	}
 
 	block(router)
