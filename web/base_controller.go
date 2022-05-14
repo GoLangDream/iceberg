@@ -30,7 +30,7 @@ func (c *BaseController) Text(body string) {
 	}
 }
 
-func (c *BaseController) Param(name string) any {
+func (c *BaseController) Param(name string) string {
 	return c.context.Param(name)
 }
 
