@@ -30,6 +30,52 @@ func (c *BaseController) Text(body string) {
 	}
 }
 
+func (c *BaseController) Param(name string) any {
+	return c.context.Param(name)
+}
+
+func (c *BaseController) Query(name string, defaultValue ...string) string {
+	switch len(defaultValue) {
+	case 0:
+		return c.context.Query(name)
+	default:
+		return c.context.DefaultQuery(name, defaultValue[0])
+	}
+}
+
+func (c *BaseController) QueryMap(name string) map[string]string {
+	return c.context.QueryMap(name)
+}
+
+func (c *BaseController) PostForm(name string, defaultValue ...string) string {
+	switch len(defaultValue) {
+	case 0:
+		return c.context.PostForm(name)
+	default:
+		return c.context.DefaultPostForm(name, defaultValue[0])
+	}
+}
+
+func (c *BaseController) PostFormMap(name string) map[string]string {
+	return c.context.PostFormMap(name)
+}
+
+func (c *BaseController) Bind(obj any) {
+	c.context.Bind(obj)
+}
+
+func (c *BaseController) ShouldBind(obj any) {
+	c.context.ShouldBind(obj)
+}
+
+func (c *BaseController) ShouldBindUri(obj any) {
+	c.context.ShouldBindUri(obj)
+}
+
+func (c *BaseController) ShouldBindHeader(obj any) {
+	c.context.ShouldBindHeader(obj)
+}
+
 func (c *BaseController) Session(name string, val ...any) any {
 	switch len(val) {
 	case 0:
