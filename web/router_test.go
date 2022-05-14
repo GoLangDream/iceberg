@@ -18,21 +18,21 @@ func checkRouter(method, path, structName, structMethod string) (result bool) {
 	return
 }
 
-var _ = BeforeSuite(func() {
-	ApplicationRouterDraw = func(router Router) {
-		router.GET("/hello", "home#index")
+var _ = Describe("Router", Ordered, func() {
+	BeforeAll(func() {
+		ApplicationRouterDraw = func(router Router) {
+			router.GET("/hello", "home#index")
 
-		router.GET("/set_session", "home#set_session")
-		router.GET("/get_session", "home#get_session")
+			router.GET("/set_session", "home#set_session")
+			router.GET("/get_session", "home#get_session")
 
-		router.GET("/set_cookie", "home#set_cookie")
-		router.GET("/get_cookie", "home#get_cookie")
-	}
+			router.GET("/set_cookie", "home#set_cookie")
+			router.GET("/get_cookie", "home#get_cookie")
+		}
 
-	initServer()
-})
+		InitServer()
+	})
 
-var _ = Describe("Router", func() {
 	Context("路由", func() {
 		It("GET /hello， home#index 会正确的路由到HomeController struct的 Index 方法上", func() {
 			Expect(checkRouter(

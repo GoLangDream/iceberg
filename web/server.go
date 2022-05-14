@@ -17,7 +17,7 @@ func initMiddleware() {
 	server.engine.Use(gin.Recovery())
 }
 
-func initServer() {
+func InitServer() {
 	initConfig()
 	initLogger()
 	initMiddleware()
@@ -42,7 +42,7 @@ func printRoutes() {
 }
 
 func Start() {
-	initServer()
+	InitServer()
 	printRoutes()
 	startServer()
 }
