@@ -35,13 +35,15 @@ func doAction(controllerName, actionName string, ctx *HttpContext) {
 	}
 
 	controller := reflect.New(controllerType)
-	baseController := newBaseController(controllerName, ctx)
+	baseController := newBaseController(controllerName, actionName, ctx)
 	controller.Elem().FieldByName("BaseController").Set(reflect.ValueOf(baseController))
 
 	method := controller.MethodByName(
 		rstring.Camelize(actionName))
-	if method.IsValid() {
+	renderMethod := controller.MethodByName("Render_")
+	if method.IsValid() && renderMethod.IsValid() {
 		method.Call([]reflect.Value{})
+		renderMethod.Call([]reflect.Value{})
 	} else {
 		log.Printf("调用的action [%s]不存在 \n", rstring.Capitalize(actionName))
 	}

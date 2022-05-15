@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -8,6 +9,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 	"log"
 	"net/http"
+	"path/filepath"
 )
 
 type Server struct {
@@ -29,6 +31,7 @@ func (s *Server) InitServer() {
 	s.initMiddleware()
 	s.initSession()
 	s.initRoutes()
+	s.initViews()
 }
 
 func (s *Server) Start() {
@@ -43,6 +46,15 @@ func (s *Server) AllRoutes() []RouterInfo {
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	s.engine.ServeHTTP(w, req)
+}
+
+func (s *Server) initViews() {
+	viewPath := filepath.Join(
+		s.application.HomePath(),
+		"web/views/**/*",
+	)
+	fmt.Println("views path is " + viewPath)
+	s.engine.LoadHTMLGlob(viewPath)
 }
 
 func (s *Server) initRoutes() {

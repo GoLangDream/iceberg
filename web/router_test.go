@@ -32,6 +32,10 @@ func (app *RouterTestApplication) RouterDraw(router *web.Router) {
 	router.GET("/get_cookie", "home#get_cookie")
 }
 
+func (app *RouterTestApplication) HomePath() string {
+	return ""
+}
+
 var _ = Describe("Router", Ordered, func() {
 	var server *web.Server
 	BeforeAll(func() {

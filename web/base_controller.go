@@ -4,28 +4,48 @@ import (
 	"fmt"
 	. "github.com/GoLangDream/rgo/option"
 	"github.com/gin-contrib/sessions"
+	"net/http"
+	"path/filepath"
 )
 
 type BaseController struct {
-	name    string
-	context *HttpContext
-	session sessions.Session
+	controllerName string
+	actionName     string
+	context        *HttpContext
+	session        sessions.Session
+	isRender       bool
 }
 
-func newBaseController(name string, ctx *HttpContext) *BaseController {
+func newBaseController(controllerName, actionName string, ctx *HttpContext) *BaseController {
 	baseController := BaseController{
-		name,
+		controllerName,
+		actionName,
 		ctx,
 		ctx.session(),
+		false,
 	}
 	return &baseController
 }
 
 func (c *BaseController) Text(body string) {
 	if c.context != nil {
+		c.isRender = true
 		c.context.text(body)
 	} else {
 		fmt.Println("http context 没有初始化")
+	}
+}
+
+func (c *BaseController) Render_() {
+	if !c.isRender && c.context != nil {
+		fmt.Println(
+			"call render method controller is " + c.controllerName +
+				" action is " + c.actionName +
+				"tmpl file is " + filepath.Join(c.controllerName, c.actionName+".html.tmpl"))
+		c.context.html(http.StatusOK, filepath.Join(c.controllerName, c.actionName+".html.tmpl"), H{
+			"controller_name": c.controllerName,
+			"action_name":     c.actionName,
+		})
 	}
 }
 

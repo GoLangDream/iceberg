@@ -15,6 +15,10 @@ func (h *HttpContext) text(body string) {
 	h.c.String(http.StatusOK, body)
 }
 
+func (h *HttpContext) html(code int, name string, obj any) {
+	h.c.HTML(code, name, obj)
+}
+
 func (h *HttpContext) session() sessions.Session {
 	return sessions.Default(h.c)
 }
