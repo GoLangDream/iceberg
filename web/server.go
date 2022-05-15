@@ -9,24 +9,27 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 )
 
 type Server struct {
-	engine      *gin.Engine
-	application Application
-	routes      Routes
+	engine     *gin.Engine
+	homePath   string
+	routerDraw func(router *Router)
+	routes     Routes
 }
 
-func CreateServer(application Application) *Server {
+func CreateServer(homePath string, routerDraw func(router *Router)) *Server {
 	return &Server{
-		engine:      gin.New(),
-		application: application,
+		engine:     gin.New(),
+		homePath:   homePath,
+		routerDraw: routerDraw,
 	}
 }
 
 func (s *Server) InitServer() {
-	initConfig()
+	initCookieConfig()
 	s.initLogger()
 	s.initMiddleware()
 	s.initSession()
@@ -49,9 +52,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) initViews() {
+	viewsPath := filepath.Join(s.homePath, "web/views")
+	dir, error := os.Stat(viewsPath)
+	if error != nil || !dir.IsDir() {
+		return
+	}
 	viewPath := filepath.Join(
-		s.application.HomePath(),
-		"web/views/**/*",
+		viewsPath,
+		"**/*",
 	)
 	fmt.Println("views path is " + viewPath)
 	s.engine.LoadHTMLGlob(viewPath)
@@ -59,11 +67,15 @@ func (s *Server) initViews() {
 
 func (s *Server) initRoutes() {
 	router := newRootRouter(s)
-	s.application.RouterDraw(router)
+	s.routerDraw(router)
 }
 
 func (s *Server) initMiddleware() {
 	s.engine.Use(gin.Recovery())
+}
+
+func (s *Server) initDatabase() {
+
 }
 
 // 需要在路由之前注册 session 否则会产生错误

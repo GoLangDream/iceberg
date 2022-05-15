@@ -19,27 +19,21 @@ func checkRouter(method, path, structName, structMethod string, server *web.Serv
 	return
 }
 
-type RouterTestApplication struct {
-}
-
-func (app *RouterTestApplication) RouterDraw(router *web.Router) {
-	router.GET("/hello", "home#index")
-
-	router.GET("/set_session", "home#set_session")
-	router.GET("/get_session", "home#get_session")
-
-	router.GET("/set_cookie", "home#set_cookie")
-	router.GET("/get_cookie", "home#get_cookie")
-}
-
-func (app *RouterTestApplication) HomePath() string {
-	return ""
-}
-
 var _ = Describe("Router", Ordered, func() {
 	var server *web.Server
+
+	var routerDraw = func(router *web.Router) {
+		router.GET("/hello", "home#index")
+
+		router.GET("/set_session", "home#set_session")
+		router.GET("/get_session", "home#get_session")
+
+		router.GET("/set_cookie", "home#set_cookie")
+		router.GET("/get_cookie", "home#get_cookie")
+	}
+
 	BeforeAll(func() {
-		server = web.CreateServer(&RouterTestApplication{})
+		server = web.CreateServer("", routerDraw)
 
 		server.InitServer()
 	})

@@ -2,8 +2,10 @@ package web
 
 import (
 	"fmt"
+	"github.com/GoLangDream/iceberg/database"
 	. "github.com/GoLangDream/rgo/option"
 	"github.com/gin-contrib/sessions"
+	"gorm.io/gorm"
 	"net/http"
 	"path/filepath"
 )
@@ -27,9 +29,13 @@ func newBaseController(controllerName, actionName string, ctx *HttpContext) *Bas
 	return &baseController
 }
 
+func (c *BaseController) DB() *gorm.DB {
+	return database.DBConn
+}
+
 func (c *BaseController) Text(body string) {
+	c.isRender = true
 	if c.context != nil {
-		c.isRender = true
 		c.context.text(body)
 	} else {
 		fmt.Println("http context 没有初始化")
@@ -37,6 +43,7 @@ func (c *BaseController) Text(body string) {
 }
 
 func (c *BaseController) Json(obj any, code ...int) {
+	c.isRender = true
 	switch len(code) {
 	case 0:
 		c.context.json(http.StatusOK, obj)

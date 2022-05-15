@@ -23,23 +23,14 @@ func (h *BaseTestController) GetQuery() {
 	h.Text("name is " + name + " age is " + age)
 }
 
-type BaseTestApplication struct {
-}
-
-func (app *BaseTestApplication) RouterDraw(router *web.Router) {
-	router.GET("/get_params/:id", "base_test#get_params")
-	router.GET("/get_query", "base_test#get_query")
-}
-
-func (app *BaseTestApplication) HomePath() string {
-	return ""
-}
-
 var _ = Describe("BaseController", Ordered, func() {
 	var server *web.Server
-
+	var routerDraw = func(router *web.Router) {
+		router.GET("/get_params/:id", "base_test#get_params")
+		router.GET("/get_query", "base_test#get_query")
+	}
 	BeforeAll(func() {
-		server = web.CreateServer(&BaseTestApplication{})
+		server = web.CreateServer("", routerDraw)
 		web.RegisterController(BaseTestController{})
 
 		server.InitServer()
