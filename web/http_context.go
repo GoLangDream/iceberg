@@ -19,6 +19,10 @@ func (h *HttpContext) html(code int, name string, obj any) {
 	h.c.HTML(code, name, obj)
 }
 
+func (h *HttpContext) json(code int, obj any) {
+	h.c.JSON(code, obj)
+}
+
 func (h *HttpContext) session() sessions.Session {
 	return sessions.Default(h.c)
 }

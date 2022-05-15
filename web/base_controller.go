@@ -36,6 +36,15 @@ func (c *BaseController) Text(body string) {
 	}
 }
 
+func (c *BaseController) Json(obj any, code ...int) {
+	switch len(code) {
+	case 0:
+		c.context.json(http.StatusOK, obj)
+	default:
+		c.context.json(code[0], obj)
+	}
+}
+
 func (c *BaseController) Render_() {
 	if !c.isRender && c.context != nil {
 		fmt.Println(
