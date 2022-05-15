@@ -9,7 +9,6 @@ import (
 type BaseController struct {
 	name    string
 	context *HttpContext
-
 	session sessions.Session
 }
 

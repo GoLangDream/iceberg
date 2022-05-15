@@ -1,13 +1,14 @@
-package web
+package web_test
 
 import (
+	"github.com/GoLangDream/iceberg/web"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-func checkRouter(method, path, structName, structMethod string) (result bool) {
+func checkRouter(method, path, structName, structMethod string, server *web.Server) (result bool) {
 	result = false
-	for _, info := range Routes() {
+	for _, info := range server.AllRoutes() {
 		if info.Method == method &&
 			info.Path == path &&
 			structName == info.StructName &&
@@ -18,19 +19,25 @@ func checkRouter(method, path, structName, structMethod string) (result bool) {
 	return
 }
 
+type RouterTestApplication struct {
+}
+
+func (app *RouterTestApplication) RouterDraw(router *web.Router) {
+	router.GET("/hello", "home#index")
+
+	router.GET("/set_session", "home#set_session")
+	router.GET("/get_session", "home#get_session")
+
+	router.GET("/set_cookie", "home#set_cookie")
+	router.GET("/get_cookie", "home#get_cookie")
+}
+
 var _ = Describe("Router", Ordered, func() {
+	var server *web.Server
 	BeforeAll(func() {
-		ApplicationRouterDraw = func(router Router) {
-			router.GET("/hello", "home#index")
+		server = web.CreateServer(&RouterTestApplication{})
 
-			router.GET("/set_session", "home#set_session")
-			router.GET("/get_session", "home#get_session")
-
-			router.GET("/set_cookie", "home#set_cookie")
-			router.GET("/get_cookie", "home#get_cookie")
-		}
-
-		InitServer()
+		server.InitServer()
 	})
 
 	Context("路由", func() {
@@ -40,6 +47,7 @@ var _ = Describe("Router", Ordered, func() {
 				"/hello",
 				"HomeController",
 				"Index",
+				server,
 			)).To(Equal(true))
 		})
 
@@ -49,6 +57,7 @@ var _ = Describe("Router", Ordered, func() {
 				"/set_session",
 				"HomeController",
 				"SetSession",
+				server,
 			)).To(Equal(true))
 		})
 	})

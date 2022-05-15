@@ -12,8 +12,8 @@ Started %s %s %s "%s" for %s at %s
 Completed %s %d %s in %s
 `
 
-func initLogger() {
-	server.engine.Use(gin.LoggerWithFormatter(func(params gin.LogFormatterParams) string {
+func (s *Server) initLogger() {
+	s.engine.Use(gin.LoggerWithFormatter(func(params gin.LogFormatterParams) string {
 		var statusColor, methodColor, resetColor string
 		if params.IsOutputColor() {
 			statusColor = params.StatusCodeColor()

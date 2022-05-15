@@ -10,24 +10,25 @@ import (
 type Router struct {
 	namespace string
 	scope     string
+	server    *Server
 	engine    gin.IRouter
 }
 
-func newRootRouter() Router {
-	return Router{"", "", server.engine}
+func newRootRouter(server *Server) *Router {
+	return &Router{"", "", server, server.engine}
 }
 
 func (r *Router) handleRequest(httpMethod, path, to string) {
 	toSlice := strings.Split(to, "#")
 	if value, ok := r.engine.(*gin.RouterGroup); ok {
-		registerRouter(httpMethod,
+		r.server.routes.registerRouter(httpMethod,
 			urlJoin(value.BasePath(), path),
 			toSlice[0],
 			toSlice[1],
 			r.namespace,
 		)
 	} else {
-		registerRouter(
+		r.server.routes.registerRouter(
 			httpMethod,
 			path,
 			toSlice[0],
