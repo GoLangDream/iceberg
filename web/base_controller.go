@@ -16,6 +16,8 @@ type BaseController struct {
 	context        *HttpContext
 	session        sessions.Session
 	isRender       bool
+	beforeActions  map[string][]func()
+	afterActions   map[string][]func()
 }
 
 func newBaseController(controllerName, actionName string, ctx *HttpContext) *BaseController {
@@ -25,12 +27,22 @@ func newBaseController(controllerName, actionName string, ctx *HttpContext) *Bas
 		ctx,
 		ctx.session(),
 		false,
+		make(map[string][]func()),
+		make(map[string][]func()),
 	}
 	return &baseController
 }
 
 func (c *BaseController) DB() *gorm.DB {
 	return database.DBConn
+}
+
+func (c *BaseController) ControllerName() string {
+	return c.controllerName
+}
+
+func (c *BaseController) ActionName() string {
+	return c.actionName
 }
 
 func (c *BaseController) Text(body string) {
@@ -52,7 +64,7 @@ func (c *BaseController) Json(obj any, code ...int) {
 	}
 }
 
-func (c *BaseController) Render_() {
+func (c *BaseController) render() {
 	if !c.isRender && c.context != nil {
 		fmt.Println(
 			"call render method controller is " + c.controllerName +
