@@ -9,5 +9,5 @@ import (
 
 func TestIceberg(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Iceberg Suite")
+	RunSpecs(t, "Iceberg 测试")
 }

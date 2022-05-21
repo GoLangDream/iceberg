@@ -1,47 +1,49 @@
 package web
 
-import "github.com/GoLangDream/rgo/rstring"
-
 func (c *BaseController) beforeActionFilter() {
 	c.callBeforeAction()
 }
 
 func (c *BaseController) afterActionFilter() {
 	c.render()
+	c.callAfterAction()
 }
 
 func (c *BaseController) callBeforeAction() {
-	filters, ok := c.beforeActions[c.actionName]
-	if ok {
-		for _, filter := range filters {
-			filter()
-		}
-	}
+	c.callActionFilter(c.beforeActions)
 }
 
 func (c *BaseController) callAfterAction() {
-	filters, ok := c.afterActions[c.actionName]
-	if ok {
-		for _, filter := range filters {
-			filter()
+	c.callActionFilter(c.afterActions)
+}
+
+func (c *BaseController) callActionFilter(actionFilters []*actionFilter) {
+	for _, actionFilter := range actionFilters {
+		if actionFilter.only != nil {
+			for _, actionName := range actionFilter.only {
+				if actionName == c.actionName {
+					actionFilter.filter()
+				}
+			}
+			continue
 		}
+		if actionFilter.except != nil {
+			for _, actionName := range actionFilter.except {
+				if actionName == c.actionName {
+					continue
+				}
+			}
+		}
+		actionFilter.filter()
 	}
 }
 
-func (c *BaseController) BeforeActon(actionName string, filterFunc func()) {
-	name := rstring.Underscore(actionName)
-	filters, ok := c.beforeActions[name]
-	if !ok {
-		filters = []func(){}
-	}
-	c.beforeActions[name] = append(filters, filterFunc)
+func (c *BaseController) BeforeAction(filter func(), options ...map[string][]string) {
+	beforeActions := createActionFilter(filter, options...)
+	c.beforeActions = append(c.beforeActions, beforeActions)
 }
 
-func (c *BaseController) AfterActon(actionName string, filterFunc func()) {
-	name := rstring.Underscore(actionName)
-	filters, ok := c.afterActions[name]
-	if !ok {
-		filters = []func(){}
-	}
-	c.afterActions[name] = append(filters, filterFunc)
+func (c *BaseController) AfterAction(filter func(), options ...map[string][]string) {
+	afterActions := createActionFilter(filter, options...)
+	c.beforeActions = append(c.beforeActions, afterActions)
 }

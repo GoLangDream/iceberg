@@ -16,8 +16,8 @@ type BaseController struct {
 	context        *HttpContext
 	session        sessions.Session
 	isRender       bool
-	beforeActions  map[string][]func()
-	afterActions   map[string][]func()
+	beforeActions  []*actionFilter
+	afterActions   []*actionFilter
 }
 
 func newBaseController(controllerName, actionName string, ctx *HttpContext) *BaseController {
@@ -27,8 +27,8 @@ func newBaseController(controllerName, actionName string, ctx *HttpContext) *Bas
 		ctx,
 		ctx.session(),
 		false,
-		make(map[string][]func()),
-		make(map[string][]func()),
+		[]*actionFilter{},
+		[]*actionFilter{},
 	}
 	return &baseController
 }
