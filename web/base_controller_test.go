@@ -8,36 +8,36 @@ import (
 	"net/http/httptest"
 )
 
-type BaseTestController struct {
+type TestBaseController struct {
 	*web.BaseController
 }
 
-func (h *BaseTestController) GetParams() {
-	id := h.Param("id")
-	h.Text("id is " + id)
+func (c *TestBaseController) GetParams() {
+	id := c.Param("id")
+	c.Text("id is " + id)
 }
 
-func (h *BaseTestController) GetQuery() {
-	name := h.Query("name")
-	age := h.Query("age", "1")
-	h.Text("name is " + name + " age is " + age)
+func (c *TestBaseController) GetQuery() {
+	name := c.Query("name")
+	age := c.Query("age", "1")
+	c.Text("name is " + name + " age is " + age)
 }
 
 var _ = Describe("BaseController", Ordered, func() {
 	var server *web.Server
 	var routerDraw = func(router *web.Router) {
-		router.GET("/get_params/:id", "base_test#get_params")
-		router.GET("/get_query", "base_test#get_query")
+		router.GET("/get_params/:id", "test_base#get_params")
+		router.GET("/get_query", "test_base#get_query")
 	}
 	BeforeAll(func() {
 		server = web.CreateServer("", routerDraw)
-		web.RegisterController(BaseTestController{})
+		web.RegisterController(TestBaseController{})
 
 		server.InitServer()
 	})
 
 	Context("http提交参数获取", func() {
-		It("GET /get_params/123， 应该能得到值为123的id", func() {
+		It("GET /get_params/123， 应该能得到值为 123 的 id", func() {
 			w := httptest.NewRecorder()
 			req, _ := http.NewRequest("GET", "/get_params/123", nil)
 			server.ServeHTTP(w, req)

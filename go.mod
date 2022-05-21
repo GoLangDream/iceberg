@@ -38,6 +38,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/stretchr/testify v1.7.1 // indirect
+	github.com/thoas/go-funk v0.9.2 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect

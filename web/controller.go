@@ -40,7 +40,6 @@ func doAction(controllerName, actionName string, ctx *HttpContext) {
 
 	action := controller.MethodByName(rstring.Camelize(actionName))
 	initController := controller.MethodByName("Init")
-
 	if initController.IsValid() {
 		initController.Call(nil)
 	}

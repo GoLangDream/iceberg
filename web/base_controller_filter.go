@@ -18,32 +18,44 @@ func (c *BaseController) callAfterAction() {
 }
 
 func (c *BaseController) callActionFilter(actionFilters []*actionFilter) {
+OUTER:
 	for _, actionFilter := range actionFilters {
 		if actionFilter.only != nil {
 			for _, actionName := range actionFilter.only {
 				if actionName == c.actionName {
 					actionFilter.filter()
+					continue OUTER
 				}
 			}
-			continue
+
 		}
 		if actionFilter.except != nil {
 			for _, actionName := range actionFilter.except {
 				if actionName == c.actionName {
-					continue
+					continue OUTER
 				}
 			}
+			actionFilter.filter()
+			continue OUTER
 		}
-		actionFilter.filter()
+
+		if actionFilter.only == nil && actionFilter.except != nil {
+			actionFilter.filter()
+		}
+
 	}
 }
 
-func (c *BaseController) BeforeAction(filter func(), options ...map[string][]string) {
-	beforeActions := createActionFilter(filter, options...)
-	c.beforeActions = append(c.beforeActions, beforeActions)
+func (c *BaseController) BeforeAction(filter func(), options ...AFH) {
+	beforeAction := createActionFilter(filter, options...)
+	if beforeAction != nil {
+		c.beforeActions = append(c.beforeActions, beforeAction)
+	}
 }
 
-func (c *BaseController) AfterAction(filter func(), options ...map[string][]string) {
-	afterActions := createActionFilter(filter, options...)
-	c.beforeActions = append(c.beforeActions, afterActions)
+func (c *BaseController) AfterAction(filter func(), options ...AFH) {
+	afterAction := createActionFilter(filter, options...)
+	if afterAction != nil {
+		c.beforeActions = append(c.beforeActions, afterAction)
+	}
 }
