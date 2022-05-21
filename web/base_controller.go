@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/GoLangDream/iceberg/database"
 	. "github.com/GoLangDream/rgo/option"
-	"github.com/gin-contrib/sessions"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
 	"gorm.io/gorm"
-	"net/http"
 	"path/filepath"
 )
 
@@ -14,7 +14,7 @@ type BaseController struct {
 	controllerName string
 	actionName     string
 	context        *HttpContext
-	session        sessions.Session
+	session        *session.Session
 	isRender       bool
 	beforeActions  []*actionFilter
 	afterActions   []*actionFilter
@@ -54,23 +54,14 @@ func (c *BaseController) Text(body string) {
 	}
 }
 
-func (c *BaseController) Json(obj any, code ...int) {
+func (c *BaseController) Json(obj any) {
 	c.isRender = true
-	switch len(code) {
-	case 0:
-		c.context.json(http.StatusOK, obj)
-	default:
-		c.context.json(code[0], obj)
-	}
+	c.context.json(obj)
 }
 
 func (c *BaseController) render() {
 	if !c.isRender && c.context != nil {
-		fmt.Println(
-			"call render method controller is " + c.controllerName +
-				" action is " + c.actionName +
-				"tmpl file is " + filepath.Join(c.controllerName, c.actionName+".html.tmpl"))
-		c.context.html(http.StatusOK, filepath.Join(c.controllerName, c.actionName+".html.tmpl"), H{
+		c.context.renderFile(filepath.Join(c.controllerName, c.actionName), fiber.Map{
 			"controller_name": c.controllerName,
 			"action_name":     c.actionName,
 		})
@@ -82,45 +73,19 @@ func (c *BaseController) Param(name string) string {
 }
 
 func (c *BaseController) Query(name string, defaultValue ...string) string {
-	switch len(defaultValue) {
-	case 0:
-		return c.context.Query(name)
-	default:
-		return c.context.DefaultQuery(name, defaultValue[0])
-	}
+	return c.context.Query(name, defaultValue...)
 }
 
-func (c *BaseController) QueryMap(name string) map[string]string {
-	return c.context.QueryMap(name)
+func (c *BaseController) FormValue(name string, defaultValue ...string) string {
+	return c.context.FormValue(name, defaultValue...)
 }
 
-func (c *BaseController) PostForm(name string, defaultValue ...string) string {
-	switch len(defaultValue) {
-	case 0:
-		return c.context.PostForm(name)
-	default:
-		return c.context.DefaultPostForm(name, defaultValue[0])
-	}
+func (c *BaseController) QueryBind(obj any) {
+	c.context.QueryBind(obj)
 }
 
-func (c *BaseController) PostFormMap(name string) map[string]string {
-	return c.context.PostFormMap(name)
-}
-
-func (c *BaseController) Bind(obj any) {
-	c.context.Bind(obj)
-}
-
-func (c *BaseController) ShouldBind(obj any) {
-	c.context.ShouldBind(obj)
-}
-
-func (c *BaseController) ShouldBindUri(obj any) {
-	c.context.ShouldBindUri(obj)
-}
-
-func (c *BaseController) ShouldBindHeader(obj any) {
-	c.context.ShouldBindHeader(obj)
+func (c *BaseController) BodyBing(obj any) {
+	c.context.BodyBind(obj)
 }
 
 func (c *BaseController) Session(name string, val ...any) any {
@@ -149,12 +114,13 @@ func (c *BaseController) Cookie(name string, val ...any) string {
 
 func (c *BaseController) setCookie(name string, value string, option Option) {
 	Merge(cookieConfig, option)
-	c.context.setCookie(
-		name,
-		value,
-		cookieConfig["maxAge"].(int),
-		cookieConfig["path"].(string),
-		cookieConfig["domain"].(string),
-		cookieConfig["secure"].(bool),
-		cookieConfig["httpOnly"].(bool))
+	cookie := new(fiber.Cookie)
+	cookie.Name = name
+	cookie.Value = value
+	cookie.Path = cookieConfig["path"].(string)
+	cookie.MaxAge = cookieConfig["maxAge"].(int)
+	cookie.Domain = cookieConfig["domain"].(string)
+	cookie.Secure = cookieConfig["secure"].(bool)
+	cookie.HTTPOnly = cookieConfig["httpOnly"].(bool)
+	c.context.setCookie(cookie)
 }

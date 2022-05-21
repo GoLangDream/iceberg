@@ -1,10 +1,9 @@
 package web
 
 import (
-	"fmt"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/template/html"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 	"log"
@@ -14,15 +13,30 @@ import (
 )
 
 type Server struct {
-	engine     *gin.Engine
+	engine     *fiber.App
+	store      *session.Store
 	homePath   string
 	routerDraw func(router *Router)
 	routes     Routes
 }
 
 func CreateServer(homePath string, routerDraw func(router *Router)) *Server {
+	vConfig, err := viewConfig(homePath)
+	var engine *fiber.App
+
+	if err == nil {
+		engine = fiber.New(fiber.Config{
+			Views:                 vConfig,
+			DisableStartupMessage: true,
+		})
+	} else {
+		engine = fiber.New(fiber.Config{
+			DisableStartupMessage: true,
+		})
+	}
+
 	return &Server{
-		engine:     gin.New(),
+		engine:     engine,
 		homePath:   homePath,
 		routerDraw: routerDraw,
 	}
@@ -34,35 +48,30 @@ func (s *Server) InitServer() {
 	s.initMiddleware()
 	s.initSession()
 	s.initRoutes()
-	s.initViews()
 }
 
 func (s *Server) Start() {
 	s.InitServer()
 	s.printRoutes()
-	s.engine.Run()
+	s.engine.Listen(":3000")
 }
 
 func (s *Server) AllRoutes() []RouterInfo {
 	return s.routes.All()
 }
 
-func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	s.engine.ServeHTTP(w, req)
+func (s *Server) Test(req *http.Request, msTimeout ...int) (*http.Response, error) {
+	return s.engine.Test(req, msTimeout...)
 }
 
-func (s *Server) initViews() {
-	viewsPath := filepath.Join(s.homePath, "web/views")
-	dir, error := os.Stat(viewsPath)
-	if error != nil || !dir.IsDir() {
-		return
+func viewConfig(homePath string) (*html.Engine, error) {
+	viewsPath := filepath.Join(homePath, "web/views")
+	dir, err := os.Stat(viewsPath)
+	if err != nil || !dir.IsDir() {
+		return nil, err
 	}
-	viewPath := filepath.Join(
-		viewsPath,
-		"**/*",
-	)
-	fmt.Println("views path is " + viewPath)
-	s.engine.LoadHTMLGlob(viewPath)
+	return html.New(viewsPath, ".html"), nil
+
 }
 
 func (s *Server) initRoutes() {
@@ -71,7 +80,7 @@ func (s *Server) initRoutes() {
 }
 
 func (s *Server) initMiddleware() {
-	s.engine.Use(gin.Recovery())
+
 }
 
 func (s *Server) initDatabase() {
@@ -81,8 +90,7 @@ func (s *Server) initDatabase() {
 // 需要在路由之前注册 session 否则会产生错误
 // 具体参考 https://github.com/gin-contrib/sessions/issues/40
 func (s *Server) initSession() {
-	store := cookie.NewStore([]byte("secret"))
-	s.engine.Use(sessions.Sessions("icebergSession", store))
+	s.store = session.New()
 }
 
 func (s *Server) printRoutes() {

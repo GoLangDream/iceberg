@@ -1,7 +1,6 @@
 package web_test
 
 import (
-	"encoding/json"
 	"github.com/GoLangDream/iceberg/web"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -63,29 +62,27 @@ var _ = Describe("BaseController", Ordered, func() {
 
 	Context("访问没有filter的action", func() {
 		It("GET /no_filter， before action 和 after action 都应该不会被调用", func() {
-			w := httptest.NewRecorder()
-			req, _ := http.NewRequest("GET", "/no_filter", nil)
-			server.ServeHTTP(w, req)
-			checkFilterResponse(w, 0, 0)
+			req := httptest.NewRequest("GET", "/no_filter", nil)
+			rep, _ := server.Test(req, 1)
+			checkFilterResponse(rep, 0, 0)
 		})
 
 		It("GET /has_filter， before action 和 after action 应该会被调用1次", func() {
-			w := httptest.NewRecorder()
-			req, _ := http.NewRequest("GET", "/has_filter", nil)
-			server.ServeHTTP(w, req)
-			checkFilterResponse(w, 1, 1)
+			req := httptest.NewRequest("GET", "/has_filter", nil)
+			rep, _ := server.Test(req, 1)
+			checkFilterResponse(rep, 1, 1)
 		})
 
 	})
 
 })
 
-func checkFilterResponse(w *httptest.ResponseRecorder, beforeActionIsCall, afterActionIsCall int) {
-	var response map[string]int
-	Expect(w.Code).To(Equal(200))
-	json.Unmarshal([]byte(w.Body.String()), &response)
-	beforeAction, _ := response["before_action_is_call"]
-	afterAction, _ := response["after_action_is_call"]
+func checkFilterResponse(response *http.Response, beforeActionIsCall, afterActionIsCall int) {
+	var result map[string]int
+	Expect(response.StatusCode).To(Equal(200))
+	parseBody(response, &result)
+	beforeAction, _ := result["before_action_is_call"]
+	afterAction, _ := result["after_action_is_call"]
 	Expect(beforeAction).To(Equal(beforeActionIsCall))
 	Expect(afterAction).To(Equal(afterActionIsCall))
 }

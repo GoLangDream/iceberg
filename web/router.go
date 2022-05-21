@@ -2,7 +2,7 @@ package web
 
 import (
 	"github.com/GoLangDream/rgo/rstring"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 	"strings"
 )
@@ -11,7 +11,7 @@ type Router struct {
 	namespace string
 	scope     string
 	server    *Server
-	engine    gin.IRouter
+	engine    fiber.Router
 }
 
 func newRootRouter(server *Server) *Router {
@@ -20,29 +20,22 @@ func newRootRouter(server *Server) *Router {
 
 func (r *Router) handleRequest(httpMethod, path, to string) {
 	toSlice := strings.Split(to, "#")
-	if value, ok := r.engine.(*gin.RouterGroup); ok {
-		r.server.routes.registerRouter(httpMethod,
-			urlJoin(value.BasePath(), path),
-			toSlice[0],
-			toSlice[1],
-			r.namespace,
-		)
-	} else {
-		r.server.routes.registerRouter(
-			httpMethod,
-			path,
-			toSlice[0],
-			toSlice[1],
-			r.namespace,
-		)
-	}
 
-	r.engine.Handle(httpMethod, path, func(ctx *gin.Context) {
-		httpContext := HttpContext{ctx}
+	r.server.routes.registerRouter(
+		httpMethod,
+		urlJoin("/", r.namespace, path),
+		toSlice[0],
+		toSlice[1],
+		r.namespace,
+	)
+
+	r.engine.Add(httpMethod, path, func(ctx *fiber.Ctx) error {
+		httpContext := HttpContext{ctx, r.server}
 		doAction(
 			urlJoin(r.namespace, toSlice[0]),
 			toSlice[1],
 			&httpContext)
+		return nil
 	})
 }
 

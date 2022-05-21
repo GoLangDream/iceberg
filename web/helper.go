@@ -1,5 +1,3 @@
 package web
 
-import "github.com/gin-gonic/gin"
-
-type H = gin.H
+type H = map[string]any
