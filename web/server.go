@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/template/html"
@@ -22,16 +23,19 @@ type Server struct {
 
 func CreateServer(homePath string, routerDraw func(router *Router)) *Server {
 	vConfig, err := viewConfig(homePath)
+	vConfig.Debug(true)
 	var engine *fiber.App
 
 	if err == nil {
 		engine = fiber.New(fiber.Config{
 			Views:                 vConfig,
 			DisableStartupMessage: true,
+			ViewsLayout:           "layouts/main",
 		})
 	} else {
 		engine = fiber.New(fiber.Config{
 			DisableStartupMessage: true,
+			ViewsLayout:           "layouts/main",
 		})
 	}
 
@@ -68,6 +72,7 @@ func viewConfig(homePath string) (*html.Engine, error) {
 	viewsPath := filepath.Join(homePath, "web/views")
 	dir, err := os.Stat(viewsPath)
 	if err != nil || !dir.IsDir() {
+		fmt.Printf("view path %s 不存在", viewsPath)
 		return nil, err
 	}
 	return html.New(viewsPath, ".html"), nil
