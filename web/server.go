@@ -23,10 +23,10 @@ type Server struct {
 
 func CreateServer(homePath string, routerDraw func(router *Router)) *Server {
 	vConfig, err := viewConfig(homePath)
-	vConfig.Debug(true)
 	var engine *fiber.App
 
 	if err == nil {
+		vConfig.Debug(true)
 		engine = fiber.New(fiber.Config{
 			Views:                 vConfig,
 			DisableStartupMessage: true,
