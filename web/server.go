@@ -30,12 +30,12 @@ func CreateServer(homePath string, routerDraw func(router *Router)) *Server {
 		engine = fiber.New(fiber.Config{
 			Views:                 vConfig,
 			DisableStartupMessage: true,
-			ViewsLayout:           "layouts/main",
+			ViewsLayout:           "layouts/default",
 		})
 	} else {
 		engine = fiber.New(fiber.Config{
 			DisableStartupMessage: true,
-			ViewsLayout:           "layouts/main",
+			ViewsLayout:           "layouts/default",
 		})
 	}
 
