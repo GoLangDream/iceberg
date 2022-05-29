@@ -6,6 +6,24 @@
 
 一个方便快速的web开发框架
 
-## 使用
+## 开始
+
+参考 https://github.com/GoLangDream/iceberg-cli 使用命令行工具开始
+
+### 新建一个项目
+
+```shell
+iceberg new test_project
+```
+
+### 其他一些命令
+
+```shell
+iceberg g m create_user                    # 生成一个migration
+iceberg g model user name:string age:uint  # 生成一个模型
+iceberg g controller user index show       # 生成一个controller 和 对应的 action
+```
+
+## 示例
 
 参考 https://github.com/GoLangDream/iceberg_example
