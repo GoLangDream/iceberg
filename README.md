@@ -24,6 +24,16 @@ iceberg g model user name:string age:uint  # 生成一个模型
 iceberg g controller user index show       # 生成一个controller 和 对应的 action
 ```
 
+### 运行
+
+```shell
+iceberg run
+```
+
+### 访问
+
+http://localhost:3000
+
 ## 示例
 
 参考 https://github.com/GoLangDream/iceberg_example
