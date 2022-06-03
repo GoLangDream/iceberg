@@ -7,7 +7,10 @@ import (
 	"path/filepath"
 )
 
-var configFiles = []string{"config/database.yml"}
+var configFiles = []string{
+	"config/database.yml",
+	"config/application.yml",
+}
 
 func InitConfig(application ApplicationConfig) {
 	config.AddDriver(yaml.Driver)
