@@ -3,7 +3,6 @@ package web
 import (
 	"github.com/GoLangDream/iceberg/log"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/template/pug"
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -47,7 +46,6 @@ func CreateServer(homePath string, routerDraw func(router *Router)) *Server {
 
 func (s *Server) InitServer() {
 	initCookieConfig()
-	s.initLogger()
 	s.initMiddleware()
 	s.initSession()
 	s.initRoutes()
@@ -87,18 +85,10 @@ func (s *Server) initRoutes() {
 	s.routerDraw(router)
 }
 
-func (s *Server) initMiddleware() {
-	s.engine.Use(logger.New(logger.Config{
-		Format: "[${time}] ${status} - ${latency} ${method} ${url}\n",
-	}))
-}
-
 func (s *Server) initDatabase() {
 
 }
 
-// 需要在路由之前注册 session 否则会产生错误
-// 具体参考 https://github.com/gin-contrib/sessions/issues/40
 func (s *Server) initSession() {
 	s.store = session.New()
 }

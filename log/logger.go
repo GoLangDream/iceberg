@@ -5,15 +5,18 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
-	"os"
+	"time"
 )
 
 var green = color.New(color.FgGreen).SprintfFunc()
-var prefix = green("[iceberg]")
 
 func init() {
-	logrus.SetOutput(os.Stdout)
 	logrus.SetFormatter(&loggerFormat{})
+}
+
+func Prefix() string {
+	now := time.Now().Format("15:04:05")
+	return green(fmt.Sprintf("[iceberg %s]", now))
 }
 
 func Infof(format string, v ...any) {
@@ -22,6 +25,10 @@ func Infof(format string, v ...any) {
 
 func Info(v ...any) {
 	logrus.Info(v...)
+}
+
+func Output() {
+
 }
 
 type loggerFormat struct {
@@ -34,6 +41,7 @@ func (l *loggerFormat) Format(entry *logrus.Entry) ([]byte, error) {
 	} else {
 		b = &bytes.Buffer{}
 	}
-	b.WriteString(fmt.Sprintf("%s %s", prefix, entry.Message))
+	b.WriteString(fmt.Sprintf("%s %s", Prefix(), entry.Message))
+	b.WriteByte('\n')
 	return b.Bytes(), nil
 }

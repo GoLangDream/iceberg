@@ -13,10 +13,10 @@ var server *web.Server
 func InitApplication(application framework.ApplicationConfig) {
 	err := os.Chdir(application.HomePath())
 	if err != nil {
-		log.Infof("运行项目 [%s] 失败\n", application.HomePath())
+		log.Infof("运行项目 [%s] 失败", application.HomePath())
 		panic(err)
 	} else {
-		log.Infof("运行项目 [%s]\n", application.HomePath())
+		log.Infof("运行项目 [%s]", application.HomePath())
 	}
 
 	server = web.CreateServer(

@@ -20,11 +20,5 @@ func InitConfig(application ApplicationConfig) {
 		panic(err)
 	}
 
-	log.Infof("加载配置文件 %s\n", strings.Join(configFiles, ", "))
-
-	//for _, configFile := range configFiles {
-	//	log.Infof("加载配置文件 [%s]\n", configFile)
-	//	configFile := filepath.Join(application.HomePath(), configFile)
-	//	config.LoadFiles(configFile)
-	//}
+	log.Infof("加载配置文件 %s", strings.Join(configFiles, ", "))
 }
