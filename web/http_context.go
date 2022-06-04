@@ -6,8 +6,7 @@ import (
 )
 
 type HttpContext struct {
-	ctx    *fiber.Ctx
-	server *Server
+	ctx *fiber.Ctx
 }
 
 func (h *HttpContext) text(body string) {
@@ -19,7 +18,7 @@ func (h *HttpContext) json(obj any) {
 }
 
 func (h *HttpContext) session() *session.Session {
-	session, _ := h.server.store.Get(h.ctx)
+	session, _ := server.store.Get(h.ctx)
 	return session
 }
 

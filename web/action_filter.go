@@ -5,8 +5,6 @@ import (
 	"github.com/thoas/go-funk"
 )
 
-type AFH = map[string][]string
-
 type actionFilter struct {
 	filter func()
 	only   []string

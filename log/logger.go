@@ -3,6 +3,7 @@ package log
 import (
 	"bytes"
 	"fmt"
+	"github.com/GoLangDream/iceberg/environment"
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"time"
@@ -20,15 +21,16 @@ func Prefix() string {
 }
 
 func Infof(format string, v ...any) {
-	logrus.Infof(format, v...)
+	if !environment.IsTest() {
+		logrus.Infof(format, v...)
+	}
+
 }
 
 func Info(v ...any) {
-	logrus.Info(v...)
-}
-
-func Output() {
-
+	if !environment.IsTest() {
+		logrus.Info(v...)
+	}
 }
 
 type loggerFormat struct {

@@ -11,7 +11,7 @@ import (
 
 var DBConn *gorm.DB
 
-func InitDatabase() {
+func Init() {
 
 	switch config.String("database.adapter") {
 	case "mysql":

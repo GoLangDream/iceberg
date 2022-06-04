@@ -8,45 +8,19 @@ import (
 	"net/http/httptest"
 )
 
-type TestBaseController struct {
-	*web.BaseController
-}
-
-func (c *TestBaseController) GetParams() {
-	id := c.Param("id")
-	c.Text("id is " + id)
-}
-
-func (c *TestBaseController) GetQuery() {
-	name := c.Query("name")
-	age := c.Query("age", "1")
-	c.Text("name is " + name + " age is " + age)
-}
-
-var _ = Describe("BaseController", Ordered, func() {
-	var server *web.Server
-	var routerDraw = func(router *web.Router) {
-		router.GET("/get_params/:id", "test_base#get_params")
-		router.GET("/get_query", "test_base#get_query")
-	}
-	BeforeAll(func() {
-		server = web.CreateServer("", routerDraw)
-		web.RegisterController(TestBaseController{})
-
-		server.InitServer()
-	})
+var _ = Describe("BaseController", func() {
 
 	Context("http提交参数获取", func() {
 		It("GET /get_params/123， 应该能得到值为 123 的 id", func() {
 			req := httptest.NewRequest("GET", "/get_params/123", nil)
-			rep, _ := server.Test(req, 1)
+			rep, _ := web.Test(req)
 			Expect(rep.StatusCode).To(Equal(200))
 			Expect(getBody(rep)).To(Equal("id is 123"))
 		})
 
 		It("GET /get_query?name=jim&age=23, 能正确读取 name 和 age的值", func() {
 			req, _ := http.NewRequest("GET", "/get_query?name=jim&age=23", nil)
-			rep, _ := server.Test(req, 1)
+			rep, _ := web.Test(req)
 			Expect(rep.StatusCode).To(Equal(200))
 			Expect(getBody(rep)).To(Equal("name is jim age is 23"))
 		})

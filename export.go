@@ -1,3 +1,3 @@
-package web
+package iceberg
 
 type H = map[string]any

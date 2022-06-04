@@ -1,58 +1,55 @@
 package web
 
 import (
+	"fmt"
+	"github.com/GoLangDream/iceberg/environment"
 	"github.com/GoLangDream/iceberg/log"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/template/pug"
-	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/jedib0t/go-pretty/v6/text"
-	"net/http"
 	"os"
 )
 
-type Server struct {
-	engine     *fiber.App
-	store      *session.Store
-	homePath   string
-	routerDraw func(router *Router)
-	routes     Routes
-}
+var server *webServer
 
-func CreateServer(homePath string, routerDraw func(router *Router)) *Server {
-	vConfig, err := viewConfig()
-	var engine *fiber.App
-
-	if err == nil {
-		vConfig.Debug(false)
-		engine = fiber.New(fiber.Config{
-			Views:                 vConfig,
-			DisableStartupMessage: true,
-			ViewsLayout:           "layouts/default",
-		})
-	} else {
-		engine = fiber.New(fiber.Config{
-			DisableStartupMessage: true,
-			ViewsLayout:           "layouts/default",
-		})
+func initServer() {
+	// 由于 fiber config 里面的 fiber.Views 是一个 interface类型
+	// 但是在判断模板不为空的时候，直接使用的是 Views == nil
+	// 就会导致如果手动传入nil进去是不对的
+	// 具体可以参考 https://juejin.cn/post/6895231755091968013
+	// 于是只好用下面的方法，模拟一个空的interface fiber.Views 传进去
+	vConfig := viewConfig()
+	var view fiber.Views
+	if vConfig != nil {
+		view = vConfig
 	}
 
-	return &Server{
-		engine:     engine,
-		homePath:   homePath,
-		routerDraw: routerDraw,
+	engine := fiber.New(fiber.Config{
+		Views:                 view,
+		DisableStartupMessage: true,
+		ViewsLayout:           "layouts/default",
+	})
+
+	server = &webServer{
+		engine: engine,
 	}
+
+	server.init()
 }
 
-func (s *Server) InitServer() {
-	initCookieConfig()
+type webServer struct {
+	engine *fiber.App
+	store  *session.Store
+}
+
+func (s *webServer) init() {
 	s.initMiddleware()
 	s.initSession()
-	s.initRoutes()
 }
 
-func (s *Server) Start() {
-	s.InitServer()
+func (s *webServer) start() {
 	s.printRoutes()
 	log.Info("将启动服务, 监听3000端口, 使用 http://127.0.0.1:3000 访问")
 	err := s.engine.Listen(":3000")
@@ -61,59 +58,30 @@ func (s *Server) Start() {
 	}
 }
 
-func (s *Server) AllRoutes() []RouterInfo {
-	return s.routes.All()
+func (s *webServer) initSession() {
+	s.store = session.New()
 }
 
-func (s *Server) Test(req *http.Request, msTimeout ...int) (*http.Response, error) {
-	return s.engine.Test(req, msTimeout...)
+func (s *webServer) initMiddleware() {
+	s.engine.Use(recover.New())
+	if !environment.IsTest() {
+		s.engine.Use(logger.New(logger.Config{
+			Format: fmt.Sprintf(
+				"%s ${ip} ${method} ${url} ${status} ${latency} \n ",
+				log.Prefix(),
+			),
+		}))
+	}
 }
 
-func viewConfig() (*pug.Engine, error) {
+func viewConfig() *pug.Engine {
 	viewsPath := "web/views"
 	dir, err := os.Stat(viewsPath)
 	if err != nil || !dir.IsDir() {
 		log.Infof("view path %s 不存在", viewsPath)
-		return nil, err
+		return nil
 	}
-	return pug.New(viewsPath, ".pug"), nil
-
-}
-
-func (s *Server) initRoutes() {
-	router := newRootRouter(s)
-	s.routerDraw(router)
-}
-
-func (s *Server) initDatabase() {
-
-}
-
-func (s *Server) initSession() {
-	s.store = session.New()
-}
-
-func (s *Server) printRoutes() {
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.Style().Format.Header = text.FormatTitle
-
-	t.AppendHeader(table.Row{"#", "Verb", "URI Pattern", "Controller#Action"})
-
-	t.SetColumnConfigs([]table.ColumnConfig{
-		{
-			Name:   "Verb",
-			Colors: text.Colors{text.BgBlack, text.FgGreen},
-		},
-	})
-
-	for index, info := range s.routes.All() {
-		t.AppendRow([]interface{}{
-			index + 1,
-			info.Method,
-			info.Path,
-			info.StructName + "#" + info.StructMethod,
-		})
-	}
-	t.Render()
+	config := pug.New(viewsPath, ".pug")
+	config.Debug(true)
+	return config
 }

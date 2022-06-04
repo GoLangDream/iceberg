@@ -10,7 +10,6 @@ func (r *Router) Namespace(name string, block func(router *Router)) {
 	router := &Router{
 		urlJoin(r.namespace, name),
 		r.scope,
-		r.server,
 		r.engine.Group(name),
 	}
 
@@ -21,7 +20,6 @@ func (r *Router) Scope(name string, block func(router *Router)) {
 	router := &Router{
 		r.namespace,
 		urlJoin(r.scope, name),
-		r.server,
 		r.engine.Group(name),
 	}
 

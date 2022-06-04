@@ -1,33 +1,24 @@
 package iceberg
 
 import (
-	"github.com/GoLangDream/iceberg/database"
-	"github.com/GoLangDream/iceberg/framework"
+	"github.com/GoLangDream/iceberg/initializers"
 	"github.com/GoLangDream/iceberg/log"
-	"github.com/GoLangDream/iceberg/web"
 	"os"
 )
 
-var server *web.Server
+func InitApplication() {
+	path, err := os.Getwd()
 
-func InitApplication(application framework.ApplicationConfig) {
-	err := os.Chdir(application.HomePath())
 	if err != nil {
-		log.Infof("运行项目 [%s] 失败", application.HomePath())
+		log.Infof("运行项目 [%s] 失败", path)
 		panic(err)
 	} else {
-		log.Infof("运行项目 [%s]", application.HomePath())
+		log.Infof("运行项目 [%s]", path)
 	}
 
-	server = web.CreateServer(
-		application.HomePath(),
-		application.RouterDraw(),
-	)
-
-	framework.InitConfig(application)
-	database.InitDatabase()
+	initializers.Init()
 }
 
 func StartApplication() {
-	server.Start()
+	initializers.Start()
 }

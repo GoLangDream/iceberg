@@ -1,4 +1,4 @@
-package framework
+package config
 
 import (
 	"github.com/GoLangDream/iceberg/log"
@@ -12,7 +12,7 @@ var configFiles = []string{
 	"config/application.yml",
 }
 
-func InitConfig(application ApplicationConfig) {
+func Init() {
 	config.AddDriver(yaml.Driver)
 	err := config.LoadExists(configFiles...)
 	if err != nil {

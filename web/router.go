@@ -10,18 +10,17 @@ import (
 type Router struct {
 	namespace string
 	scope     string
-	server    *Server
 	engine    fiber.Router
 }
 
-func newRootRouter(server *Server) *Router {
-	return &Router{"", "", server, server.engine}
+func newRootRouter() *Router {
+	return &Router{"", "", server.engine}
 }
 
 func (r *Router) handleRequest(httpMethod, path, to string) {
 	toSlice := strings.Split(to, "#")
 
-	r.server.routes.registerRouter(
+	registerRouter(
 		httpMethod,
 		urlJoin("/", r.namespace, path),
 		toSlice[0],
@@ -30,7 +29,7 @@ func (r *Router) handleRequest(httpMethod, path, to string) {
 	)
 
 	r.engine.Add(httpMethod, path, func(ctx *fiber.Ctx) error {
-		httpContext := HttpContext{ctx, r.server}
+		httpContext := HttpContext{ctx}
 		doAction(
 			urlJoin(r.namespace, toSlice[0]),
 			toSlice[1],
