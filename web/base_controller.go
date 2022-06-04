@@ -1,12 +1,12 @@
 package web
 
 import (
-	"fmt"
 	"github.com/GoLangDream/iceberg/database"
 	. "github.com/GoLangDream/rgo/option"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"gorm.io/gorm"
+	"log"
 	"path/filepath"
 )
 
@@ -50,7 +50,7 @@ func (c *BaseController) Text(body string) {
 	if c.context != nil {
 		c.context.text(body)
 	} else {
-		fmt.Println("http context 没有初始化")
+		log.Println("http context 没有初始化")
 	}
 }
 
@@ -61,7 +61,7 @@ func (c *BaseController) Json(obj any) {
 
 func (c *BaseController) render() {
 	if !c.isRender && c.context != nil {
-		fmt.Printf("render view tmpl file %s", filepath.Join(c.controllerName, c.actionName))
+		log.Printf("渲染模板 [%s]", filepath.Join(c.controllerName, c.actionName))
 		c.context.renderFile(filepath.Join(c.controllerName, c.actionName), fiber.Map{
 			"controller_name": c.controllerName,
 			"action_name":     c.actionName,

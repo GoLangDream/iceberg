@@ -4,12 +4,14 @@ go 1.18
 
 require (
 	github.com/GoLangDream/rgo v0.0.0-20220503130521-0f726acae124
+	github.com/fatih/color v1.13.0
 	github.com/gofiber/fiber/v2 v2.33.0
 	github.com/gofiber/template v1.6.27
 	github.com/gookit/config/v2 v2.0.27
 	github.com/jedib0t/go-pretty/v6 v6.3.1
 	github.com/onsi/ginkgo/v2 v2.1.3
 	github.com/onsi/gomega v1.19.0
+	github.com/sirupsen/logrus v1.8.1
 	github.com/thoas/go-funk v0.9.2
 	gorm.io/driver/mysql v1.3.3
 	gorm.io/driver/postgres v1.3.7
@@ -18,6 +20,8 @@ require (
 )
 
 require (
+	github.com/Joker/hpp v1.0.0 // indirect
+	github.com/Joker/jade v1.1.3 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/gertd/go-pluralize v0.2.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
@@ -36,6 +40,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.15.0 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mattn/go-sqlite3 v1.14.12 // indirect

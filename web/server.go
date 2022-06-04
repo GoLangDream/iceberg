@@ -1,16 +1,15 @@
 package web
 
 import (
-	"fmt"
+	"github.com/GoLangDream/iceberg/log"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/session"
-	"github.com/gofiber/template/html"
+	"github.com/gofiber/template/pug"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
-	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 )
 
 type Server struct {
@@ -22,11 +21,11 @@ type Server struct {
 }
 
 func CreateServer(homePath string, routerDraw func(router *Router)) *Server {
-	vConfig, err := viewConfig(homePath)
+	vConfig, err := viewConfig()
 	var engine *fiber.App
 
 	if err == nil {
-		vConfig.Debug(true)
+		vConfig.Debug(false)
 		engine = fiber.New(fiber.Config{
 			Views:                 vConfig,
 			DisableStartupMessage: true,
@@ -57,7 +56,11 @@ func (s *Server) InitServer() {
 func (s *Server) Start() {
 	s.InitServer()
 	s.printRoutes()
-	s.engine.Listen(":3000")
+	log.Info("将启动服务, 监听3000端口, 使用 http://127.0.0.1:3000 访问")
+	err := s.engine.Listen(":3000")
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (s *Server) AllRoutes() []RouterInfo {
@@ -68,14 +71,14 @@ func (s *Server) Test(req *http.Request, msTimeout ...int) (*http.Response, erro
 	return s.engine.Test(req, msTimeout...)
 }
 
-func viewConfig(homePath string) (*html.Engine, error) {
-	viewsPath := filepath.Join(homePath, "web/views")
+func viewConfig() (*pug.Engine, error) {
+	viewsPath := "web/views"
 	dir, err := os.Stat(viewsPath)
 	if err != nil || !dir.IsDir() {
-		fmt.Printf("view path %s 不存在", viewsPath)
+		log.Infof("view path %s 不存在", viewsPath)
 		return nil, err
 	}
-	return html.New(viewsPath, ".html"), nil
+	return pug.New(viewsPath, ".pug"), nil
 
 }
 
@@ -85,7 +88,9 @@ func (s *Server) initRoutes() {
 }
 
 func (s *Server) initMiddleware() {
-
+	s.engine.Use(logger.New(logger.Config{
+		Format: "[${time}] ${status} - ${latency} ${method} ${url}\n",
+	}))
 }
 
 func (s *Server) initDatabase() {
@@ -100,9 +105,18 @@ func (s *Server) initSession() {
 
 func (s *Server) printRoutes() {
 	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
 	t.Style().Format.Header = text.FormatTitle
-	t.SetOutputMirror(log.Writer())
+
 	t.AppendHeader(table.Row{"#", "Verb", "URI Pattern", "Controller#Action"})
+
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{
+			Name:   "Verb",
+			Colors: text.Colors{text.BgBlack, text.FgGreen},
+		},
+	})
+
 	for index, info := range s.routes.All() {
 		t.AppendRow([]interface{}{
 			index + 1,

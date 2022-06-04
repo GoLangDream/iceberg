@@ -1,10 +1,10 @@
 package framework
 
 import (
-	"fmt"
+	"github.com/GoLangDream/iceberg/log"
 	"github.com/gookit/config/v2"
 	"github.com/gookit/config/v2/yaml"
-	"path/filepath"
+	"strings"
 )
 
 var configFiles = []string{
@@ -14,9 +14,17 @@ var configFiles = []string{
 
 func InitConfig(application ApplicationConfig) {
 	config.AddDriver(yaml.Driver)
-	for _, configFile := range configFiles {
-		fmt.Printf("加载配置文件 [%s]\n", configFile)
-		configFile := filepath.Join(application.HomePath(), configFile)
-		config.LoadFiles(configFile)
+	err := config.LoadExists(configFiles...)
+	if err != nil {
+		log.Info("加载配置文件错误")
+		panic(err)
 	}
+
+	log.Infof("加载配置文件 %s\n", strings.Join(configFiles, ", "))
+
+	//for _, configFile := range configFiles {
+	//	log.Infof("加载配置文件 [%s]\n", configFile)
+	//	configFile := filepath.Join(application.HomePath(), configFile)
+	//	config.LoadFiles(configFile)
+	//}
 }
