@@ -18,12 +18,24 @@ func Get() Environment {
 	return env
 }
 
+func IsNotDevelopment() bool {
+	return env != Development
+}
+
 func IsDevelopment() bool {
 	return env == Development
 }
 
+func IsNotTest() bool {
+	return env != Test
+}
+
 func IsTest() bool {
 	return env == Test
+}
+
+func IsNotProduction() bool {
+	return env != Production
 }
 
 func IsProduction() bool {
