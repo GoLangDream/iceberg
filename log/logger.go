@@ -24,7 +24,6 @@ func Infof(format string, v ...any) {
 	if !environment.IsTest() {
 		logrus.Infof(format, v...)
 	}
-
 }
 
 func Info(v ...any) {
