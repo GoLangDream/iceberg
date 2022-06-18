@@ -1,6 +1,7 @@
 package log_test
 
 import (
+	"github.com/GoLangDream/iceberg/environment"
 	"github.com/GoLangDream/iceberg/log"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -23,12 +24,53 @@ var _ = Describe("Env", func() {
 		Expect(hook.LastEntry().Level).To(Equal(logrus.InfoLevel))
 		output, _ := hook.LastEntry().Bytes()
 		Expect(string(output)).To(
-			MatchRegexp(`\[iceberg \d{2}:\d{2}:\d{2}\] abc test`),
+			MatchRegexp(`.*\[iceberg \d{2}:\d{2}:\d{2}\].* abc test`),
 		)
 
 		hook.Reset()
+		Expect(hook.LastEntry()).To(BeNil())
+	})
+
+	It("Info 在测试环境下，不输出任何内容", func() {
+		environment.Set(environment.Test)
+
+		hook := test.NewGlobal()
+		log.Info("abc test")
 
 		Expect(hook.LastEntry()).To(BeNil())
+
+		hook.Reset()
+		Expect(hook.LastEntry()).To(BeNil())
+
+		environment.Set(environment.Development)
+	})
+
+	It("Infof 能正确的带上前缀输出内容", func() {
+		hook := test.NewGlobal()
+		log.Infof("abc test %s", "ddd")
+
+		Expect(hook.LastEntry().Level).To(Equal(logrus.InfoLevel))
+		output, _ := hook.LastEntry().Bytes()
+		Expect(string(output)).To(
+			MatchRegexp(`.*\[iceberg \d{2}:\d{2}:\d{2}\].* abc test ddd`),
+		)
+
+		hook.Reset()
+		Expect(hook.LastEntry()).To(BeNil())
+	})
+
+	It("Infof 在测试环境下，不输出任何内容", func() {
+		environment.Set(environment.Test)
+
+		hook := test.NewGlobal()
+		log.Infof("abc test %s", "ddd")
+
+		Expect(hook.LastEntry()).To(BeNil())
+
+		hook.Reset()
+		Expect(hook.LastEntry()).To(BeNil())
+
+		environment.Set(environment.Development)
 	})
 
 })
