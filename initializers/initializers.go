@@ -6,6 +6,7 @@ import (
 	"github.com/GoLangDream/iceberg/environment"
 	"github.com/GoLangDream/iceberg/log"
 	"github.com/GoLangDream/iceberg/web"
+	"github.com/GoLangDream/iceberg/work"
 )
 
 func Init() {
@@ -17,5 +18,6 @@ func Init() {
 }
 
 func Start() {
+	work.Start()
 	web.Start()
 }

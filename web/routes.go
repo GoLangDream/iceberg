@@ -31,6 +31,8 @@ func (s *webServer) printRoutes() {
 	t.SetOutputMirror(os.Stdout)
 	t.Style().Format.Header = text.FormatTitle
 
+	t.SetTitle("网站路由")
+	t.Style().Title.Align = text.AlignCenter
 	t.AppendHeader(table.Row{"#", "Verb", "URI Pattern", "Controller#Action"})
 
 	t.SetColumnConfigs([]table.ColumnConfig{

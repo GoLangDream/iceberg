@@ -82,6 +82,6 @@ func viewConfig() *pug.Engine {
 		return nil
 	}
 	config := pug.New(viewsPath, ".pug")
-	config.Debug(true)
+	//config.Debug(environment.IsDevelopment())
 	return config
 }
