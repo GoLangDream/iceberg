@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"github.com/GoLangDream/iceberg/environment"
+	"github.com/GoLangDream/iceberg/log"
 	"github.com/gookit/config/v2"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
@@ -13,6 +14,7 @@ import (
 var DBConn *gorm.DB
 
 func Init() {
+	var err error = nil
 
 	switch config.String(keyWithEnv("database.adapter")) {
 	case "mysql":
@@ -25,7 +27,7 @@ func Init() {
 			config.String(keyWithEnv("database.%s.name")),
 			config.String(keyWithEnv("database.%s.encoding")),
 		)
-		DBConn, _ = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		DBConn, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	case "postgres":
 		dsn := fmt.Sprintf(
 			"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
@@ -35,14 +37,17 @@ func Init() {
 			config.String(keyWithEnv("database.%s.name")),
 			config.String(keyWithEnv("database.%s.port")),
 		)
-		DBConn, _ = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		DBConn, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	case "sqlite":
-		DBConn, _ = gorm.Open(
+		DBConn, err = gorm.Open(
 			sqlite.Open(
 				config.String(keyWithEnv("database.%s.file")),
 			),
 			&gorm.Config{},
 		)
+	}
+	if err != nil {
+		log.Infof("数据库链接失败 %s", err)
 	}
 }
 
