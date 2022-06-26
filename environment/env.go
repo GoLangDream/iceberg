@@ -57,3 +57,16 @@ func IsNotProduction() bool {
 func IsProduction() bool {
 	return env == Production
 }
+
+func Name() string {
+	switch env {
+	case Production:
+		return "production"
+	case Test:
+		return "test"
+	case Development:
+		return "development"
+
+	}
+	return ""
+}
