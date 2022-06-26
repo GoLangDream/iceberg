@@ -14,7 +14,7 @@ var DBConn *gorm.DB
 
 func Init() {
 
-	switch config.String("database.adapter") {
+	switch config.String(keyWithEnv("database.adapter")) {
 	case "mysql":
 		dsn := fmt.Sprintf(
 			"%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
