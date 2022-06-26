@@ -6,13 +6,17 @@ import (
 	"github.com/GoLangDream/iceberg/environment"
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
+	"io/ioutil"
 	"time"
 )
 
 var green = color.New(color.FgGreen).SprintfFunc()
 
-func init() {
+func Init() {
 	logrus.SetFormatter(&loggerFormat{})
+	if environment.IsTest() {
+		logrus.SetOutput(ioutil.Discard)
+	}
 }
 
 func Prefix() string {
@@ -21,15 +25,11 @@ func Prefix() string {
 }
 
 func Infof(format string, v ...any) {
-	if !environment.IsTest() {
-		logrus.Infof(format, v...)
-	}
+	logrus.Infof(format, v...)
 }
 
 func Info(v ...any) {
-	if !environment.IsTest() {
-		logrus.Info(v...)
-	}
+	logrus.Info(v...)
 }
 
 type loggerFormat struct {

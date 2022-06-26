@@ -1,5 +1,7 @@
 package environment
 
+import "os"
+
 type Environment = int
 
 const (
@@ -9,6 +11,20 @@ const (
 )
 
 var env = Development
+
+func Init() {
+	systemEnv, ok := os.LookupEnv("ICEBERG_ENV")
+	if ok {
+		switch systemEnv {
+		case "production":
+			Set(Production)
+		case "development":
+			Set(Development)
+		case "test":
+			Set(Test)
+		}
+	}
+}
 
 func Set(e Environment) {
 	env = e
