@@ -12,6 +12,7 @@ type workInfo struct {
 	name   string
 	spec   string
 	taskID cron.EntryID
+	cmd    func()
 }
 
 var cronTask *cron.Cron = cron.New()
@@ -23,7 +24,7 @@ func Start() {
 }
 
 func Register(name string, spec string, cmd func()) {
-	jobID, _ := cronTask.AddFunc(spec, func() {
+	fullCmd := func() {
 		log.Infof("定时任务 [%s] 开始执行", name)
 		cmd()
 		info, ok := works[name]
@@ -31,11 +32,21 @@ func Register(name string, spec string, cmd func()) {
 			task := cronTask.Entry(info.taskID)
 			log.Infof("定时任务 [%s] 执行完成，下次执行时间 %s", name, task.Next.Local())
 		}
-	})
+	}
+
+	jobID, _ := cronTask.AddFunc(spec, fullCmd)
 	works[name] = &workInfo{
 		name:   name,
 		spec:   spec,
 		taskID: jobID,
+		cmd:    fullCmd,
+	}
+}
+
+func RunWorkNow(name string) {
+	info, ok := works[name]
+	if ok {
+		info.cmd()
 	}
 }
 
