@@ -16,7 +16,7 @@ var DBConn *gorm.DB
 func Init() {
 	var err error = nil
 
-	switch config.String(keyWithEnv("database.adapter")) {
+	switch config.String(keyWithEnv("database.%s.adapter")) {
 	case "mysql":
 		dsn := fmt.Sprintf(
 			"%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
@@ -45,6 +45,8 @@ func Init() {
 			),
 			&gorm.Config{},
 		)
+	default:
+		log.Info("没有可以加载的数据库驱动")
 	}
 	if err != nil {
 		log.Infof("数据库链接失败 %s", err)
