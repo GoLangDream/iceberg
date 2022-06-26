@@ -10,10 +10,10 @@ func InitApplication() {
 	path, err := os.Getwd()
 
 	if err != nil {
-		log.Infof("运行项目 [%s] 失败", path)
+		log.Debugf("运行项目 [%s] 失败", path)
 		panic(err)
 	} else {
-		log.Infof("运行项目 [%s]", path)
+		log.Debugf("运行项目 [%s]", path)
 	}
 
 	initializers.Init()

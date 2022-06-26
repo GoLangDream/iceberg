@@ -78,7 +78,7 @@ func viewConfig() *pug.Engine {
 	viewsPath := "web/views"
 	dir, err := os.Stat(viewsPath)
 	if err != nil || !dir.IsDir() {
-		log.Infof("view path %s 不存在", viewsPath)
+		log.Debugf("view path %s 不存在", viewsPath)
 		return nil
 	}
 	config := pug.New(viewsPath, ".pug")

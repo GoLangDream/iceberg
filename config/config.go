@@ -20,5 +20,5 @@ func Init() {
 		panic(err)
 	}
 
-	log.Infof("加载配置文件 %s", strings.Join(configFiles, ", "))
+	log.Debugf("加载配置文件 %s", strings.Join(configFiles, ", "))
 }

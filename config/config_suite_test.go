@@ -1,6 +1,8 @@
 package config_test
 
 import (
+	"github.com/GoLangDream/iceberg/environment"
+	"github.com/GoLangDream/iceberg/initializers"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -11,3 +13,8 @@ func TestConfig(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Config Suite")
 }
+
+var _ = BeforeSuite(func() {
+	environment.Set(environment.Test)
+	initializers.Init()
+})

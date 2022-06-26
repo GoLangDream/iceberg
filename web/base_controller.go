@@ -61,7 +61,7 @@ func (c *BaseController) Json(obj any) {
 
 func (c *BaseController) render() {
 	if !c.isRender && c.context != nil {
-		log.Infof("渲染模板 [%s]", filepath.Join(c.controllerName, c.actionName))
+		log.Debugf("渲染模板 [%s]", filepath.Join(c.controllerName, c.actionName))
 		c.context.renderFile(filepath.Join(c.controllerName, c.actionName), fiber.Map{
 			"controller_name": c.controllerName,
 			"action_name":     c.actionName,

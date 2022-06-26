@@ -2,6 +2,7 @@ package iceberg_test
 
 import (
 	"github.com/GoLangDream/iceberg/environment"
+	"github.com/GoLangDream/iceberg/initializers"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -15,4 +16,5 @@ func TestIceberg(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	environment.Set(environment.Test)
+	initializers.Init()
 })
