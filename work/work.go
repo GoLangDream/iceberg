@@ -6,6 +6,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/robfig/cron/v3"
 	"os"
+	"runtime"
 )
 
 type workInfo struct {
@@ -16,6 +17,7 @@ type workInfo struct {
 }
 
 var cronTask *cron.Cron = cron.New()
+
 var works = make(map[string]*workInfo)
 
 func Start() {
@@ -23,8 +25,21 @@ func Start() {
 	printAllTasks()
 }
 
+func getCurrentGoroutineStack() string {
+	var buf [4096]byte
+	n := runtime.Stack(buf[:], false)
+	return string(buf[:n])
+}
+
 func Register(name string, spec string, cmd func()) {
 	fullCmd := func() {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Infof("异步任务执行异常 %v", err)
+				log.Info(getCurrentGoroutineStack())
+			}
+		}()
+
 		log.Infof("定时任务 [%s] 开始执行", name)
 		cmd()
 		info, ok := works[name]
