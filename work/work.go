@@ -43,9 +43,17 @@ func Register(name string, spec string, cmd func()) {
 	}
 }
 
-func RunWorkNow(name string) {
-	info, ok := works[name]
-	if ok {
+func RunWorksNow(names ...string) {
+	for _, name := range names {
+		info, ok := works[name]
+		if ok {
+			info.cmd()
+		}
+	}
+}
+
+func RunAllWorksNow() {
+	for _, info := range works {
 		info.cmd()
 	}
 }
