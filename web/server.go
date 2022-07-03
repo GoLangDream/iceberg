@@ -63,7 +63,9 @@ func (s *webServer) initSession() {
 }
 
 func (s *webServer) initMiddleware() {
-	s.engine.Use(recover.New())
+	s.engine.Use(recover.New(recover.Config{
+		EnableStackTrace: environment.IsDevelopment(),
+	}))
 	if !environment.IsTest() {
 		s.engine.Use(logger.New(logger.Config{
 			Format: fmt.Sprintf(
