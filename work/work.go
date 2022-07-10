@@ -1,6 +1,7 @@
 package work
 
 import (
+	"github.com/GoLangDream/iceberg/environment"
 	"github.com/GoLangDream/iceberg/log"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
@@ -21,7 +22,9 @@ var cronTask *cron.Cron = cron.New()
 var works = make(map[string]*workInfo)
 
 func Start() {
-	cronTask.Start()
+	if environment.IsProduction() {
+		cronTask.Start()
+	}
 	printAllTasks()
 }
 
