@@ -53,3 +53,11 @@ func (h *HttpContext) BodyBind(obj any) error {
 func (h *HttpContext) FormValue(name string, defaultValue ...string) string {
 	return h.ctx.FormValue(name, defaultValue...)
 }
+
+func (h *HttpContext) SetHeader(key, value string) {
+	h.ctx.Set(key, value)
+}
+
+func (h *HttpContext) GetHeader(key string) string {
+	return h.ctx.Get(key)
+}

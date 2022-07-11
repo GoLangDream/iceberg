@@ -125,3 +125,13 @@ func (c *BaseController) setCookie(name string, value string, option Option) {
 	cookie.HTTPOnly = cookieConfig["httpOnly"].(bool)
 	c.context.setCookie(cookie)
 }
+
+func (c *BaseController) Header(name string, val ...string) string {
+	switch len(val) {
+	case 0:
+		return c.context.GetHeader(name)
+	case 1:
+		c.context.SetHeader(name, val[0])
+	}
+	return ""
+}
