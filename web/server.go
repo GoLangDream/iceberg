@@ -1,15 +1,15 @@
 package web
 
 import (
-	"fmt"
 	"github.com/GoLangDream/iceberg/environment"
 	"github.com/GoLangDream/iceberg/log"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/template/pug"
+	"github.com/google/uuid"
 	"os"
+	"time"
 )
 
 var server *webServer
@@ -63,17 +63,18 @@ func (s *webServer) initSession() {
 }
 
 func (s *webServer) initMiddleware() {
+	s.engine.Use(requestLoggerMiddle)
 	s.engine.Use(recover.New(recover.Config{
 		EnableStackTrace: environment.IsDevelopment(),
 	}))
-	if !environment.IsTest() {
-		s.engine.Use(logger.New(logger.Config{
-			Format: fmt.Sprintf(
-				"%s ${ip} ${method} ${url} ${status} ${latency} \n ",
-				log.Prefix(),
-			),
-		}))
-	}
+	//if !environment.IsTest() {
+	//	s.engine.Use(logger.New(logger.Config{
+	//		Format: fmt.Sprintf(
+	//			"%s ${ip} ${method} ${url} ${status} ${latency} \n ",
+	//			log.Prefix(),
+	//		),
+	//	}))
+	//}
 }
 
 func viewConfig() *pug.Engine {
@@ -86,4 +87,14 @@ func viewConfig() *pug.Engine {
 	config := pug.New(viewsPath, ".pug")
 	//config.Debug(environment.IsDevelopment())
 	return config
+}
+
+func requestLoggerMiddle(c *fiber.Ctx) error {
+	start := time.Now()
+	requestID := uuid.NewString()
+	log.Infof("%s %s %s, 请求ID %s", c.IP(), c.Method(), c.OriginalURL(), requestID)
+	err := c.Next()
+	end := time.Now()
+	log.Infof("结果 %d, 耗时 %s, 请求ID %s", c.Response().StatusCode(), end.Sub(start).String(), requestID)
+	return err
 }
