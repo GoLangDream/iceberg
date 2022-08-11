@@ -84,9 +84,9 @@ func viewConfig() *pug.Engine {
 func requestLoggerMiddle(c *fiber.Ctx) error {
 	start := time.Now()
 	requestID := uuid.NewString()
-	log.Infof("%s %s %s, 请求ID %s", c.IP(), c.Method(), c.OriginalURL(), requestID)
+	log.Infof("[%s] => %s %s %s", requestID, c.IP(), c.Method(), c.OriginalURL())
 	err := c.Next()
 	end := time.Now()
-	log.Infof("结果 %d, 耗时 %s, 请求ID %s", c.Response().StatusCode(), end.Sub(start).String(), requestID)
+	log.Infof("[%s] <= 结果 %d, 耗时 %s", requestID, c.Response().StatusCode(), end.Sub(start).String())
 	return err
 }
