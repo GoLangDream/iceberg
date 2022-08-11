@@ -22,7 +22,7 @@ func (r *Router) handleRequest(httpMethod, path, to string) {
 
 	registerRouter(
 		httpMethod,
-		urlJoin("/", r.namespace, path),
+		urlJoin("/", r.scope, path),
 		toSlice[0],
 		toSlice[1],
 		r.namespace,

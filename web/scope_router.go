@@ -9,7 +9,7 @@ func urlJoin(paths ...string) string {
 func (r *Router) Namespace(name string, block func(router *Router)) {
 	router := &Router{
 		urlJoin(r.namespace, name),
-		r.scope,
+		urlJoin(r.scope, r.namespace),
 		r.engine.Group(name),
 	}
 
