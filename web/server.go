@@ -73,7 +73,7 @@ func (s *webServer) initMiddleware() {
 }
 
 func (s *webServer) useNewrelicMiddleware() {
-	if config.String("application.newrelic.license") != "" {
+	if config.String("application.newrelic.license", "") != "" {
 		cfg := fibernewrelic.Config{
 			License:       config.String("application.newrelic.license"),
 			AppName:       "application.name" + "_" + environment.Name(),
