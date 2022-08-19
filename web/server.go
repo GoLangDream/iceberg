@@ -3,11 +3,13 @@ package web
 import (
 	"github.com/GoLangDream/iceberg/environment"
 	"github.com/GoLangDream/iceberg/log"
+	"github.com/gofiber/contrib/fibernewrelic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/template/pug"
 	"github.com/google/uuid"
+	"github.com/gookit/config/v2"
 	"os"
 	"time"
 )
@@ -67,6 +69,17 @@ func (s *webServer) initMiddleware() {
 	s.engine.Use(recover.New(recover.Config{
 		EnableStackTrace: environment.IsDevelopment(),
 	}))
+	s.useNewrelicMiddleware()
+}
+
+func (s *webServer) useNewrelicMiddleware() {
+	cfg := fibernewrelic.Config{
+		License:       config.String("application.newrelic.license"),
+		AppName:       "application.name" + "_" + environment.Name(),
+		Enabled:       true,
+		TransportType: "HTTP",
+	}
+	s.engine.Use(fibernewrelic.New(cfg))
 }
 
 func viewConfig() *pug.Engine {
