@@ -73,10 +73,12 @@ func (s *webServer) initMiddleware() {
 }
 
 func (s *webServer) useNewrelicMiddleware() {
-	if config.String("application.newrelic.license", "") != "" {
+	newrelicLicense := config.String("application.newrelic.license", "")
+	if newrelicLicense != "" {
+		log.Infof("%s 应用添加了Newrelic", config.String("application.name"))
 		cfg := fibernewrelic.Config{
-			License:       config.String("application.newrelic.license"),
-			AppName:       "application.name" + "_" + environment.Name(),
+			License:       newrelicLicense,
+			AppName:       config.String("application.name") + "_" + environment.Name(),
 			Enabled:       true,
 			TransportType: "HTTPS",
 		}
