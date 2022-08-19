@@ -73,11 +73,12 @@ func (s *webServer) initMiddleware() {
 }
 
 func (s *webServer) useNewrelicMiddleware() {
+	log.Infof("enable newrelic middleware %s", config.String("application.newrelic.license"))
 	cfg := fibernewrelic.Config{
 		License:       config.String("application.newrelic.license"),
 		AppName:       "application.name" + "_" + environment.Name(),
 		Enabled:       true,
-		TransportType: "HTTP",
+		TransportType: "HTTPS",
 	}
 	s.engine.Use(fibernewrelic.New(cfg))
 }
