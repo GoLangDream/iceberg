@@ -5,7 +5,6 @@ import (
 	"github.com/GoLangDream/iceberg/log"
 	"github.com/gookit/config/v2"
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"os"
 )
 
 var App *newrelic.Application = nil
@@ -19,7 +18,7 @@ func Init() {
 	app, err := newrelic.NewApplication(
 		newrelic.ConfigAppName(appName),
 		newrelic.ConfigLicense(newrelicLicense),
-		newrelic.ConfigDebugLogger(os.Stdout),
+		//newrelic.ConfigDebugLogger(os.Stdout),
 		newrelic.ConfigAppLogForwardingEnabled(true),
 	)
 	if err != nil {
