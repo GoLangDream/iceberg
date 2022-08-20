@@ -1,6 +1,7 @@
 package initializers
 
 import (
+	"github.com/GoLangDream/iceberg/apm"
 	"github.com/GoLangDream/iceberg/config"
 	"github.com/GoLangDream/iceberg/database"
 	"github.com/GoLangDream/iceberg/environment"
@@ -13,6 +14,7 @@ func Init() {
 	environment.Init()
 	config.Init()
 	log.Init()
+	apm.Init()
 	database.Init()
 	web.Init()
 }

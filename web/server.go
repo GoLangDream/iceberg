@@ -1,15 +1,17 @@
 package web
 
 import (
+	"github.com/GoLangDream/iceberg/apm"
+	"github.com/GoLangDream/iceberg/database"
 	"github.com/GoLangDream/iceberg/environment"
 	"github.com/GoLangDream/iceberg/log"
-	"github.com/gofiber/contrib/fibernewrelic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/template/pug"
 	"github.com/google/uuid"
-	"github.com/gookit/config/v2"
+	"github.com/newrelic/go-agent/v3/newrelic"
+	"net/url"
 	"os"
 	"time"
 )
@@ -65,25 +67,11 @@ func (s *webServer) initSession() {
 }
 
 func (s *webServer) initMiddleware() {
+	s.engine.Use(newrelicMiddleware)
 	s.engine.Use(requestLoggerMiddle)
 	s.engine.Use(recover.New(recover.Config{
 		EnableStackTrace: environment.IsDevelopment(),
 	}))
-	s.useNewrelicMiddleware()
-}
-
-func (s *webServer) useNewrelicMiddleware() {
-	newrelicLicense := config.String("application.newrelic.license", "")
-	if newrelicLicense != "" {
-		log.Infof("%s 应用添加了Newrelic", config.String("application.name"))
-		cfg := fibernewrelic.Config{
-			License:       newrelicLicense,
-			AppName:       config.String("application.name") + "_" + environment.Name(),
-			Enabled:       true,
-			TransportType: "HTTPS",
-		}
-		s.engine.Use(fibernewrelic.New(cfg))
-	}
 }
 
 func viewConfig() *pug.Engine {
@@ -105,5 +93,36 @@ func requestLoggerMiddle(c *fiber.Ctx) error {
 	err := c.Next()
 	end := time.Now()
 	log.Infof("[%s] <= 结果 %d, 耗时 %s", requestID, c.Response().StatusCode(), end.Sub(start).String())
+	return err
+}
+
+func newrelicMiddleware(c *fiber.Ctx) error {
+	if apm.App == nil {
+		return c.Next()
+	}
+
+	txn := apm.App.StartTransaction(c.Method() + " " + c.Path())
+	database.StartTrace()
+	originalURL, err := url.Parse(c.OriginalURL())
+	if err != nil {
+		return c.Next()
+	}
+
+	txn.SetWebRequest(newrelic.WebRequest{
+		URL:       originalURL,
+		Method:    c.Method(),
+		Transport: newrelic.TransportType(c.Protocol()),
+		Host:      c.Hostname(),
+	})
+
+	err = c.Next()
+	if err != nil {
+		txn.NoticeError(err)
+	}
+
+	defer txn.SetWebResponse(nil).WriteHeader(c.Response().StatusCode())
+	defer database.EndTrace()
+	defer txn.End()
+
 	return err
 }

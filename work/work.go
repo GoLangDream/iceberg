@@ -1,6 +1,7 @@
 package work
 
 import (
+	"github.com/GoLangDream/iceberg/database"
 	"github.com/GoLangDream/iceberg/environment"
 	"github.com/GoLangDream/iceberg/log"
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -47,8 +48,10 @@ func Register(name string, spec string, cmd func()) {
 		cmd()
 		info, ok := works[name]
 		if ok {
+			database.StartTrace()
 			task := cronTask.Entry(info.taskID)
 			log.Infof("定时任务 [%s] 执行完成，下次执行时间 %s", name, task.Next.Local())
+			defer database.EndTrace()
 		}
 	}
 
