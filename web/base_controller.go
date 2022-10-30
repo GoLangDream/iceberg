@@ -59,6 +59,9 @@ func (c *BaseController) Json(obj any) {
 	c.context.json(obj)
 }
 
+func (c *BaseController) RedirectTo(url string, status int) {
+	c.context.RedirectTo(url, status)
+}
 func (c *BaseController) render() {
 	if !c.isRender && c.context != nil {
 		log.Debugf("渲染模板 [%s]", filepath.Join(c.controllerName, c.actionName))

@@ -17,6 +17,10 @@ func (h *HttpContext) json(obj any) {
 	h.ctx.JSON(obj)
 }
 
+func (h *HttpContext) RedirectTo(url string, status int) {
+	h.ctx.Redirect(url, status)
+}
+
 func (h *HttpContext) session() *session.Session {
 	session, _ := server.store.Get(h.ctx)
 	return session
